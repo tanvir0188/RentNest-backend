@@ -1,0 +1,16 @@
+model Property {
+    id         String @id @default(uuid())
+    price      Float
+    type       String
+    location   String
+    landLordId String
+    landLord   User   @relation(fields: [landLordId], references: [id], onDelete: Cascade)
+
+    categoryId String
+    category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("properties")
+}

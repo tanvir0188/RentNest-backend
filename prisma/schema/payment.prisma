@@ -1,0 +1,23 @@
+model Payment {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    amount        Float
+    status        PaymentStatus @default(PENDING)
+    paymentMethod String
+
+    //stripe related ids
+
+    //stripe customer id
+    stripeCustomerId String @unique
+
+    //stripe payment intent id
+    stripePaymentIntentId String @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("payments")
+}
