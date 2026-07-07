@@ -34,8 +34,18 @@ import { userService } from "./user.service";
 // }
 
 
-const registerUser = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
+const registerUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
+    const emailExist = await userService.emailExistInDB(payload.email);
+    if (emailExist) {
+        sendResponse(res, {
+            success: false,
+            statusCode: httpStatus.BAD_REQUEST,
+            message: "Email already exists",
+            data: null
+        })
+        return;
+    }
 
     const user = await userService.registerUserIntoDB(payload);
 
@@ -56,7 +66,7 @@ const registerUser = catchAsync( async (req: Request, res: Response, next: NextF
     })
 })
 
-const getMyProfile = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
+const getMyProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     // const {accessToken} = req.cookies;
     // console.log(req.user, "user request");
@@ -78,7 +88,7 @@ const getMyProfile = catchAsync( async (req: Request, res: Response, next: NextF
     })
 })
 
-const updateMyProfile = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
+const updateMyProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
 
     const payload = req.body;

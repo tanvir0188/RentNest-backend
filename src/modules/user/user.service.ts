@@ -3,8 +3,8 @@ import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { RegisterUserPayload } from "./user.interface";
 
-const registerUserIntoDB = async (payload: RegisterUserPayload) =>{
-    const { name, email, password, profilePhoto } = payload;
+const registerUserIntoDB = async (payload: RegisterUserPayload) => {
+    const { name, email, role, password, profilePhoto } = payload;
     const isUserExist = await prisma.user.findUnique({
         where: { email }
     })
@@ -20,7 +20,8 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) =>{
             name,
             email,
             password: hashedPassword,
-            profile : {
+            role: role || "TENANT",
+            profile: {
                 create: {
                     profilePhoto
                 }
@@ -50,44 +51,54 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) =>{
 
     return user;
 }
+const emailExistInDB = async (email: string) => {
+    const user = await prisma.user.findUnique({
+        where: { email }
+    })
 
-const getMyProfileFromDB = async (userId : string) => {
+    if (user) {
+        return true;
+    }
+
+    return false;
+}
+const getMyProfileFromDB = async (userId: string) => {
     const user = await prisma.user.findUniqueOrThrow({
-        where : {id : userId},
-        omit : {
-            password : true
+        where: { id: userId },
+        omit: {
+            password: true
         },
-        include : {
-            profile : true
+        include: {
+            profile: true
         }
     });
 
     return user;
 }
 
-const updateMyProfileInDB = async (userId : string, payload : any) => {
-    const {name, email, profilePhoto, bio} = payload;
+const updateMyProfileInDB = async (userId: string, payload: any) => {
+    const { name, email, profilePhoto, bio } = payload;
 
     const updatedUser = await prisma.user.update({
-        where : { id : userId},
+        where: { id: userId },
 
-        data : {
+        data: {
             name,
             email,
-            profile : {
-                update : {
+            profile: {
+                update: {
                     profilePhoto,
                     bio
                 }
             }
         },
 
-        omit : {
-            password : true
+        omit: {
+            password: true
         },
 
-        include : {
-            profile : true
+        include: {
+            profile: true
         }
     })
 
@@ -97,5 +108,6 @@ const updateMyProfileInDB = async (userId : string, payload : any) => {
 export const userService = {
     registerUserIntoDB,
     getMyProfileFromDB,
-    updateMyProfileInDB
+    updateMyProfileInDB,
+    emailExistInDB
 }
