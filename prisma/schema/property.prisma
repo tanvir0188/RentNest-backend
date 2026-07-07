@@ -9,8 +9,12 @@ model Property {
     categoryId String
     category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    isAvailable Boolean
+
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+    rentalRequests RentalRequest[]
+    reviews        Review[]
 
     @@map("properties")
 }
