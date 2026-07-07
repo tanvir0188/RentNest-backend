@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
+import httpStatus from "http-status";
 import { JwtPayload, SignOptions } from "jsonwebtoken";
 import config from "../../config";
+import { AppError } from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
 import { jwtUtils } from "../../utils/jwt";
 import { ILoginUser } from "./auth.interface";
@@ -24,17 +26,17 @@ const loginUser = async (payload: ILoginUser) => {
         where: { email }
     })
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
 
     if (user.activeStatus === "BLOCKED") {
-        throw new Error("Your account has been blocked. Please contact support.");
+        throw new AppError(httpStatus.FORBIDDEN, "Your account has been blocked. Please contact support.");
     }
 
     const isPasswordMatched = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatched) {
-        throw new Error("Password is incorrect");
+        throw new AppError(httpStatus.UNAUTHORIZED, "Password is incorrect");
     }
 
     const jwtPayload = {
