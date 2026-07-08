@@ -16,3 +16,7 @@ export interface UpdatePropertyPayload {
     categoryId?: string;
     isAvailable?: boolean;
 }
+
+export interface CategoryPayload {
+    title: string;
+}

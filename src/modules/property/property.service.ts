@@ -1,7 +1,7 @@
 import { Prisma } from "../../../generated/prisma/client";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
-import { CreatePropertyPayload, UpdatePropertyPayload } from "./property.interface";
+import { CreatePropertyPayload, UpdatePropertyPayload, type CategoryPayload } from "./property.interface";
 
 const getAllProperties = async (filters: any, options: any) => {
     const { page = 1, size = 10 } = options;
@@ -128,7 +128,7 @@ const deleteProperty = async (id: string) => {
     return result;
 };
 
-const createCategory = async (payload: { title: string }) => {
+const createCategory = async (payload: CategoryPayload) => {
     const isCategoryExist = await prisma.category.findUnique({
         where: { title: payload.title }
     });
@@ -138,6 +138,39 @@ const createCategory = async (payload: { title: string }) => {
     }
 
     const result = await prisma.category.create({
+        data: payload
+    });
+    return result;
+};
+
+const deleteCategory = async (id: string) => {
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) {
+        throw new AppError(404, "Category not found");
+    }
+
+    const result = await prisma.category.delete({
+        where: { id }
+    });
+    return result;
+};
+
+const updateCategory = async (id: string, payload: CategoryPayload) => {
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) {
+        throw new AppError(404, "Category not found");
+    }
+
+    const isTitleExists = await prisma.category.findUnique({
+        where: { title: payload.title }
+    })
+
+    if (isTitleExists && isTitleExists.id !== id) {
+        throw new AppError(400, "Category with this title already exists");
+    }
+
+    const result = await prisma.category.update({
+        where: { id },
         data: payload
     });
     return result;
@@ -155,5 +188,7 @@ export const propertyService = {
     updateProperty,
     deleteProperty,
     createCategory,
+    deleteCategory,
+    updateCategory,
     getAllCategories
 };

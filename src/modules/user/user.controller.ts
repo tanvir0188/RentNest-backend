@@ -116,8 +116,31 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response, next: Nex
     })
 })
 
+const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await userService.getAllUsersFromDB();
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Users fetched successfully",
+        data: result
+    });
+})
+
+const toggleUserStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params as { id: string };
+    const result = await userService.toggleUserActiveDB(id);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User status toggled successfully",
+        data: result
+    });
+})
+
 export const userController = {
     registerUser,
     getMyProfile,
-    updateMyProfile
+    updateMyProfile,
+    getAllUsers,
+    toggleUserStatus
 }

@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { rentalRequestService } from "./rentalRequest.service";
+import type { RequestStatus } from "../../../generated/prisma/enums";
 
 const createRentalRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
@@ -61,11 +62,25 @@ const getAllRequests = catchAsync(async (req: Request, res: Response, next: Next
     });
 });
 
+const acceptOrRejectRentalRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const requestId = req.params.id as string;
+    const userId = req.user?.id as string;
+    const status = req.body.status as RequestStatus;
+    const result = await rentalRequestService.acceptOrRejectRentalRequestDB(requestId, userId, status);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: `Rental request ${status} successfully`,
+        data: result
+    });
+});
+
 export const rentalRequestController = {
     createRentalRequest,
     getAllRentalRequestsByTenant,
     getAllRentalRequestsByLandLord,
     getRentalRequestDetail,
-    getAllRequests
+    getAllRequests,
+    acceptOrRejectRentalRequest
 };
 

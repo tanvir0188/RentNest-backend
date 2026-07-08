@@ -5,14 +5,24 @@ import { Role } from "../../../generated/prisma/enums";
 
 const router = express.Router();
 
-router.get("/properties", propertyController.getAllProperties);
-router.post("/landlord/properties", auth(Role.LANDLORD), propertyController.createProperty);
+// PUBLIC ROUTES
 
-router.post("/category", auth(Role.LANDLORD, Role.ADMIN), propertyController.createCategory);
+router.get("/properties", propertyController.getAllProperties);
+router.get("/properties/:id", propertyController.getPropertyDetails);
 router.get("/categories", propertyController.getAllCategories);
 
-router.get("/properties/:id", propertyController.getPropertyDetails);
+
+// LANDLORD ROUTES
+
+router.post("/landlord/properties", auth(Role.LANDLORD), propertyController.createProperty);
 router.put("/landlord/properties/:id", auth(Role.LANDLORD), propertyController.updateProperty);
 router.delete("/landlord/properties/:id", auth(Role.LANDLORD), propertyController.deleteProperty);
+
+
+// ADMIN ROUTES
+
+router.post("/admin/category", auth(Role.ADMIN), propertyController.createCategory);
+router.put("/admin/category/:id", auth(Role.ADMIN), propertyController.updateCategory);
+router.delete("/admin/category/:id", auth(Role.ADMIN), propertyController.deleteCategory);
 
 export const propertyRoutes = router;

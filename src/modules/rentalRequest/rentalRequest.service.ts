@@ -1,3 +1,4 @@
+import { RequestStatus } from "../../../generated/prisma/enums";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
 
@@ -104,10 +105,44 @@ const getAllRentalRequestFromDb = async () => {
     return result;
 }
 
+const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, status: RequestStatus) => {
+    const rentalRequest = await prisma.rentalRequest.findUnique({
+        where: { id: requestId },
+        include: {
+            property: {
+                select: {
+                    landLordId: true
+                }
+            }
+        }
+    });
+
+    if (!rentalRequest) {
+        throw new AppError(404, "Rental request not found");
+    }
+
+    if (rentalRequest.property.landLordId !== userId) {
+        throw new AppError(403, "You are not authorized to perform this action");
+    }
+
+    if (rentalRequest.status !== RequestStatus.PENDING) {
+        throw new AppError(400, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
+    }
+
+    const updatedRequest = await prisma.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+            status: status
+        }
+    });
+    return updatedRequest.status;
+}
+
 export const rentalRequestService = {
     createRentalRequestIntoDB,
     getAllRentalRequestsFromDBByUserId,
     getRentalRequestDetailDB,
     getAllRentalRequestFromDb,
-    getRentalRequestsForLandLordDB
+    getRentalRequestsForLandLordDB,
+    acceptOrRejectRentalRequestDB
 };
