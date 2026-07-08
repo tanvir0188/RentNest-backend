@@ -8,6 +8,7 @@ import { authRoutes } from "./modules/auth/auth.routes";
 import { userRoutes } from "./modules/user/user.route";
 import { propertyRoutes } from "./modules/property/property.route";
 import { rentalRequestRoutes } from "./modules/rentalRequest/rentalRequest.route";
+import { paymentRoutes } from "./modules/payment/payment.route";
 
 
 
@@ -68,7 +69,7 @@ const endpointSecret = config.stripe_webhook_secret;
 //     response.send();
 // })
 
-app.use("/api/subscription/webhook", express.raw({ type: 'application/json' }))
+app.use("/api/payment/webhook", express.raw({ type: 'application/json' }))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -85,6 +86,7 @@ app.use("/api/users", userRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api", propertyRoutes)
 app.use("/api", rentalRequestRoutes)
+app.use("/api/payment", paymentRoutes)
 
 // app.use((req : Request, res : Response) => {
 //     res.status(404).json({

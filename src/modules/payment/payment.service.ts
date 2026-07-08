@@ -83,25 +83,24 @@ const listenWebhookAndStoreIntoDB = async (req: Request, res: Response) => {
         const paymentMethod = session.payment_method_types?.[0] || 'card';
         const customerId = session.customer as string;
 
-        // Create payment record in database
-        await prisma.payment.create({
-            data: {
-                userId,
-                stripePaymentIntentId: session.payment_intent as string,
-                amount,
-                paymentMethod: paymentMethod,
-                stripeCustomerId: customerId,
-                rentalRequestId,
-                status: PaymentStatus.SUCCESS,
-            },
-        });
-
-        // Update rental request status
-        await prisma.rentalRequest.update({
-            where: { id: rentalRequestId },
-            data: {
-                status: RequestStatus.APPROVED,
-            },
+        await prisma.$transaction(async (tx) => {
+            await tx.payment.create({
+                data: {
+                    userId,
+                    stripePaymentIntentId: session.payment_intent as string,
+                    amount,
+                    paymentMethod: paymentMethod,
+                    stripeCustomerId: customerId,
+                    rentalRequestId,
+                    status: PaymentStatus.SUCCESS,
+                },
+            });
+            await tx.rentalRequest.update({
+                where: { id: rentalRequestId },
+                data: {
+                    status: RequestStatus.APPROVED,
+                },
+            });
         });
     }
 
