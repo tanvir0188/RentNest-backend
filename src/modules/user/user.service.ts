@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { RegisterUserPayload, UpdateProfilePayload } from "./user.interface";
+import { ActiveStatus, Role } from "../../../generated/prisma/enums";
+import { AppError } from "../../errors/AppError";
 
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
     const { name, email, role, password, profilePhoto } = payload;
@@ -104,10 +106,51 @@ const updateMyProfileInDB = async (userId: string, payload: UpdateProfilePayload
 
     return updatedUser;
 }
+//all users excluding admin
+const getAllUsersFromDB = async () => {
+    const users = await prisma.user.findMany({
+        where: {
+            NOT: {
+                role: Role.ADMIN
+            }
+        },
+        omit: {
+            password: true
+        },
+        include: {
+            profile: true
+        }
+    });
+
+    return users;
+}
+
+const toggleUserActiveDB = async (userId: string) => {
+    const user = await prisma.user.findUniqueOrThrow({
+        where: { id: userId }
+    });
+    if (!user) {
+        throw new AppError(404, "User not found")
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            activeStatus: user.activeStatus === ActiveStatus.ACTIVE ? ActiveStatus.BLOCKED : ActiveStatus.ACTIVE
+        },
+        select: {
+            activeStatus: true
+        }
+    });
+    return updatedUser;
+}
+
 
 export const userService = {
     registerUserIntoDB,
     getMyProfileFromDB,
     updateMyProfileInDB,
-    emailExistInDB
+    emailExistInDB,
+    getAllUsersFromDB,
+    toggleUserActiveDB
 }

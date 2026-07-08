@@ -7,6 +7,7 @@ import { notFound } from "./middlewares/notFound";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { userRoutes } from "./modules/user/user.route";
 import { propertyRoutes } from "./modules/property/property.route";
+import { rentalRequestRoutes } from "./modules/rentalRequest/rentalRequest.route";
 
 
 
@@ -83,6 +84,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/users", userRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api", propertyRoutes)
+app.use("/api", rentalRequestRoutes)
 
 // app.use((req : Request, res : Response) => {
 //     res.status(404).json({
