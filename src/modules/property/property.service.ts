@@ -128,10 +128,32 @@ const deleteProperty = async (id: string) => {
     return result;
 };
 
+const createCategory = async (payload: { title: string }) => {
+    const isCategoryExist = await prisma.category.findUnique({
+        where: { title: payload.title }
+    });
+
+    if (isCategoryExist) {
+        throw new AppError(400, "Category with this title already exists");
+    }
+
+    const result = await prisma.category.create({
+        data: payload
+    });
+    return result;
+};
+
+const getAllCategories = async () => {
+    const result = await prisma.category.findMany();
+    return result;
+};
+
 export const propertyService = {
     getAllProperties,
     getPropertyDetails,
     createProperty,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    createCategory,
+    getAllCategories
 };

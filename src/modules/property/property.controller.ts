@@ -79,10 +79,34 @@ const deleteProperty = catchAsync(async (req: Request, res: Response, next: Next
     });
 });
 
+const createCategory = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await propertyService.createCategory(req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Category created successfully",
+        data: result
+    });
+});
+
+const getAllCategories = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await propertyService.getAllCategories();
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Categories fetched successfully",
+        data: result
+    });
+});
+
 export const propertyController = {
     getAllProperties,
     getPropertyDetails,
     createProperty,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    createCategory,
+    getAllCategories
 };
