@@ -49,11 +49,11 @@ const getAllProperties = async (filters: any, options: any) => {
                 select: {
                     id: true,
                     name: true,
-                    email: true,
-                    profile: true
+                    email: true                    
                 }
             },
-            amenities: true
+            amenities: true,
+            reviews: true
         }
     });
 
@@ -98,11 +98,12 @@ const getPropertyDetails = async (id: string) => {
 
 };
 
-const createProperty = async (payload: CreatePropertyPayload) => {
+const createProperty = async (payload: CreatePropertyPayload, landLordId: string) => {
     const { amenities, ...propertyData } = payload;
     const result = await prisma.property.create({
         data: {
             ...propertyData,
+            landLordId,
             ...(amenities && amenities.length > 0 && {
                 amenities: {
                     connect: amenities.map(id => ({ id }))

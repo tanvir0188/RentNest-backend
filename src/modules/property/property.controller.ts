@@ -45,11 +45,13 @@ const getPropertyDetails = catchAsync(async (req: Request, res: Response, next: 
 });
 
 const createProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await propertyService.createProperty(req.body);
+    const landLordId = req.user?.id; 
+    console.log("Landlord ID:", landLordId); 
+    const result = await propertyService.createProperty({ ...req.body, landLordId }, landLordId as string);
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
+        statusCode: httpStatus.CREATED, 
         message: "Property created successfully",
         data: result
     });

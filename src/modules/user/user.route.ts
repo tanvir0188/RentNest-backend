@@ -11,8 +11,8 @@ router.post("/register", userController.registerUser);
 
 // ADMIN ROUTES
 
-router.get("/users", auth(Role.ADMIN), userController.getAllUsers);
-router.put("/users/:id/toggle-status", auth(Role.ADMIN), userController.toggleUserStatus);
+router.get("/", auth(Role.ADMIN), userController.getAllUsers);
+router.put("/admin/users/:id/toggle-status", auth(Role.ADMIN), userController.toggleUserStatus);
 
 
 // SHARED ROUTES
