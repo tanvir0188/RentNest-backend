@@ -1,0 +1,137 @@
+import { Prisma } from "../../../generated/prisma/client";
+import { AppError } from "../../errors/AppError";
+import { prisma } from "../../lib/prisma";
+import { CreatePropertyPayload, UpdatePropertyPayload } from "./property.interface";
+
+const getAllProperties = async (filters: any, options: any) => {
+    const { page = 1, size = 10 } = options;
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
+    const { location, price, type } = filters;
+
+    const andConditions: Prisma.PropertyWhereInput[] = [];
+
+    if (location) {
+        andConditions.push({
+            location: {
+                contains: location
+            }
+        });
+    }
+
+    if (type) {
+        andConditions.push({
+            type: {
+                equals: type
+            }
+        });
+    }
+
+    if (price) {
+        andConditions.push({
+            price: {
+                equals: Number(price)
+            }
+        });
+    }
+
+    const whereConditions: Prisma.PropertyWhereInput =
+        andConditions.length > 0 ? { AND: andConditions } : {};
+
+    const properties = await prisma.property.findMany({
+        where: whereConditions,
+        skip,
+        take,
+        include: {
+            category: true,
+            landLord: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profile: true
+                }
+            }
+        }
+    });
+
+    const total = await prisma.property.count({
+        where: whereConditions
+    });
+
+    return {
+        meta: {
+            page: Number(page),
+            size: Number(size),
+            total,
+            totalPages: Math.ceil(total / Number(size))
+        },
+        data: properties
+    };
+};
+
+const getPropertyDetails = async (id: string) => {
+    const property = await prisma.property.findUnique({
+        where: { id },
+        include: {
+            category: true,
+            landLord: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profile: true
+                }
+            },
+            reviews: true
+        }
+    });
+
+    if (!property) {
+        throw new AppError(404, "Property not found");
+    }
+
+    return property;
+
+};
+
+const createProperty = async (payload: CreatePropertyPayload) => {
+    const result = await prisma.property.create({
+        data: payload
+    });
+    return result;
+};
+
+const updateProperty = async (id: string, payload: UpdatePropertyPayload) => {
+    const property = await prisma.property.findUnique({ where: { id } });
+    if (!property) {
+        throw new AppError(404, "Property not found");
+    }
+
+    const result = await prisma.property.update({
+        where: { id },
+        data: payload
+    });
+    return result;
+};
+
+const deleteProperty = async (id: string) => {
+    const property = await prisma.property.findUnique({ where: { id } });
+    if (!property) {
+        throw new AppError(404, "Property not found");
+    }
+
+    const result = await prisma.property.delete({
+        where: { id }
+    });
+    return result;
+};
+
+export const propertyService = {
+    getAllProperties,
+    getPropertyDetails,
+    createProperty,
+    updateProperty,
+    deleteProperty
+};

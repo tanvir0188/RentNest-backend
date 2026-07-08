@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { userService } from "./user.service";
+import { AppError } from "../../errors/AppError";
 
 
 
@@ -92,6 +93,18 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response, next: Nex
     const userId = req.user?.id as string;
 
     const payload = req.body;
+    if (payload.email) {
+        const emailExists = await userService.emailExistInDB(payload.email);
+        if (emailExists) {
+            sendResponse(res, {
+                success: false,
+                statusCode: httpStatus.BAD_REQUEST,
+                message: "Email already exists",
+                data: null
+            })
+            return;
+        }
+    }
 
     const updatedProfile = await userService.updateMyProfileInDB(userId, payload);
 

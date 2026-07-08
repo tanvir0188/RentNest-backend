@@ -47,6 +47,6 @@ router.get("/me",
     userController.getMyProfile);
 
 
-router.put("/my-profile", auth(Role.ADMIN, Role.TENANT, Role.LANDLORD), userController.updateMyProfile);
+router.put("/profile", auth(Role.ADMIN, Role.TENANT, Role.LANDLORD), userController.updateMyProfile);
 
 export const userRoutes = router;

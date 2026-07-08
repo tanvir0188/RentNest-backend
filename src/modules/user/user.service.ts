@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
-import { RegisterUserPayload } from "./user.interface";
+import { RegisterUserPayload, UpdateProfilePayload } from "./user.interface";
 
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
     const { name, email, role, password, profilePhoto } = payload;
@@ -76,7 +76,7 @@ const getMyProfileFromDB = async (userId: string) => {
     return user;
 }
 
-const updateMyProfileInDB = async (userId: string, payload: any) => {
+const updateMyProfileInDB = async (userId: string, payload: UpdateProfilePayload) => {
     const { name, email, profilePhoto, bio } = payload;
 
     const updatedUser = await prisma.user.update({
