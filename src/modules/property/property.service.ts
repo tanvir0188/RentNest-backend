@@ -52,7 +52,8 @@ const getAllProperties = async (filters: any, options: any) => {
                     email: true,
                     profile: true
                 }
-            }
+            },
+            amenities: true
         }
     });
 
@@ -84,7 +85,8 @@ const getPropertyDetails = async (id: string) => {
                     profile: true
                 }
             },
-            reviews: true
+            reviews: true,
+            amenities: true
         }
     });
 
@@ -97,8 +99,17 @@ const getPropertyDetails = async (id: string) => {
 };
 
 const createProperty = async (payload: CreatePropertyPayload) => {
+    const { amenities, ...propertyData } = payload;
     const result = await prisma.property.create({
-        data: payload
+        data: {
+            ...propertyData,
+            ...(amenities && amenities.length > 0 && {
+                amenities: {
+                    connect: amenities.map(id => ({ id }))
+                }
+            })
+        },
+        include: { amenities: true }
     });
     return result;
 };
@@ -109,9 +120,19 @@ const updateProperty = async (id: string, payload: UpdatePropertyPayload) => {
         throw new AppError(404, "Property not found");
     }
 
+    const { amenities, ...propertyData } = payload;
+
     const result = await prisma.property.update({
         where: { id },
-        data: payload
+        data: {
+            ...propertyData,
+            ...(amenities && {
+                amenities: {
+                    set: amenities.map(amenityId => ({ id: amenityId }))
+                }
+            })
+        },
+        include: { amenities: true }
     });
     return result;
 };
@@ -181,6 +202,24 @@ const getAllCategories = async () => {
     return result;
 };
 
+const createAmenity = async (payload: { title: string }) => {
+    const isExist = await prisma.amenity.findUnique({
+        where: { title: payload.title }
+    });
+    if (isExist) {
+        throw new AppError(400, "Amenity with this title already exists");
+    }
+    const result = await prisma.amenity.create({
+        data: payload
+    });
+    return result;
+};
+
+const getAllAmenities = async () => {
+    const result = await prisma.amenity.findMany();
+    return result;
+};
+
 export const propertyService = {
     getAllProperties,
     getPropertyDetails,
@@ -190,5 +229,7 @@ export const propertyService = {
     createCategory,
     deleteCategory,
     updateCategory,
-    getAllCategories
+    getAllCategories,
+    createAmenity,
+    getAllAmenities
 };

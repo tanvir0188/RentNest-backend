@@ -1,0 +1,11 @@
+model Amenity {
+    id    String @id @default(uuid())
+    title String @unique
+
+    properties Property[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("amenity")
+}

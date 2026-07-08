@@ -16,6 +16,7 @@ model Property {
     updatedAt      DateTime        @updatedAt
     rentalRequests RentalRequest[]
     reviews        Review[]
+    amenities      Amenity[]
 
     @@map("properties")
 }

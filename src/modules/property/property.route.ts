@@ -10,6 +10,7 @@ const router = express.Router();
 router.get("/properties", propertyController.getAllProperties);
 router.get("/properties/:id", propertyController.getPropertyDetails);
 router.get("/categories", propertyController.getAllCategories);
+router.get("/amenities", propertyController.getAllAmenities);
 
 
 // LANDLORD ROUTES
@@ -24,5 +25,7 @@ router.delete("/landlord/properties/:id", auth(Role.LANDLORD), propertyControlle
 router.post("/admin/category", auth(Role.ADMIN), propertyController.createCategory);
 router.put("/admin/category/:id", auth(Role.ADMIN), propertyController.updateCategory);
 router.delete("/admin/category/:id", auth(Role.ADMIN), propertyController.deleteCategory);
+
+router.post("/admin/amenity", auth(Role.ADMIN), propertyController.createAmenity);
 
 export const propertyRoutes = router;

@@ -6,6 +6,7 @@ export interface CreatePropertyPayload {
     landLordId: string;
     categoryId: string;
     isAvailable: boolean;
+    amenities?: string[];
 }
 
 export interface UpdatePropertyPayload {
@@ -15,6 +16,7 @@ export interface UpdatePropertyPayload {
     location?: string;
     categoryId?: string;
     isAvailable?: boolean;
+    amenities?: string[];
 }
 
 export interface CategoryPayload {

@@ -125,6 +125,28 @@ const updateCategory = catchAsync(async (req: Request, res: Response, next: Next
     });
 });
 
+const createAmenity = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await propertyService.createAmenity(req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Amenity created successfully",
+        data: result
+    });
+});
+
+const getAllAmenities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await propertyService.getAllAmenities();
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Amenities fetched successfully",
+        data: result
+    });
+});
+
 export const propertyController = {
     getAllProperties,
     getPropertyDetails,
@@ -134,5 +156,7 @@ export const propertyController = {
     createCategory,
     deleteCategory,
     updateCategory,
-    getAllCategories
+    getAllCategories,
+    createAmenity,
+    getAllAmenities
 };
