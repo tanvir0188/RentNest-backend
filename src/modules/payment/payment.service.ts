@@ -30,7 +30,19 @@ const createCheckoutSessionStripe = async (userId: string, rentalRequestId: stri
     if (!rentalRequest) {
         throw new AppError(404, "Rental request not found");
     }
+
+    const existingPayment = await prisma.payment.findFirst({
+        where: {
+            rentalRequestId: rentalRequestId,
+            status: PaymentStatus.SUCCESS
+        }
+    });
+
+    if (existingPayment) {
+        throw new AppError(400, "Payment has already been made for this rental request.");
+    }
     const price = rentalRequest.property.price;
+    console.log('price from db', price)
 
     const customer = await stripe.customers.create({
         email: user.email,
@@ -49,7 +61,7 @@ const createCheckoutSessionStripe = async (userId: string, rentalRequestId: stri
                         name: 'Rental Payment',
                         description: `Payment for rental request ${rentalRequest.property.title}`,
                     },
-                    unit_amount: amountInCents,
+                    unit_amount: amountInCents * 100,
                 },
                 quantity: 1,
             },
@@ -154,7 +166,6 @@ const getPaymentByIdDB = async (id: string, userId: string, role: string) => {
         throw new AppError(404, "Payment not found");
     }
 
-    // users who did not create the payment should not access it, unless they are ADMIN
     if (role !== 'ADMIN' && payment.userId !== userId) {
         throw new AppError(403, "You are not authorized to view this payment");
     }

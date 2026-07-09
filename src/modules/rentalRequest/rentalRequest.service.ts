@@ -85,6 +85,14 @@ const getRentalRequestDetailDB = async (requestId: string) => {
                     email: true,
                 }
             },
+            payment: {
+                select: {
+                    status: true,
+                    amount: true,
+                    createdAt: true
+
+                }
+            }
 
         }
     });

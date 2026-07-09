@@ -69,7 +69,7 @@ const endpointSecret = config.stripe_webhook_secret;
 //     response.send();
 // })
 
-app.use("/api/payment/webhook", express.raw({ type: 'application/json' }))
+app.use("/api/webhook", express.raw({ type: 'application/json' }))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
