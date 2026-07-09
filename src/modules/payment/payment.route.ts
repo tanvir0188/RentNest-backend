@@ -13,6 +13,11 @@ router.get("/payments/:id", auth(Role.TENANT, Role.ADMIN), paymentController.get
 router.get("/payments", auth(Role.TENANT, Role.ADMIN), paymentController.getPaymentListByTenant);
 
 // ==============================
+// ADMIN ROUTES
+// ==============================
+router.patch("/admin/payments/:id/status", auth(Role.ADMIN), paymentController.changePaymentStatus);
+
+// ==============================
 // PUBLIC ROUTES (Webhook)
 // ==============================
 router.post("/webhook", paymentController.handleWebhook);

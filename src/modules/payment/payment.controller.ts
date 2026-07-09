@@ -47,9 +47,22 @@ const getPaymentListByTenant = catchAsync(async (req: Request, res: Response, ne
     });
 });
 
+const changePaymentStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const paymentId = req.params.id as string;
+    const { status } = req.body;
+    const result = await paymentService.changePaymentStatusDB(paymentId, status);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Payment status updated successfully",
+        data: result
+    });
+});
+
 export const paymentController = {
     createCheckoutSession,
     handleWebhook,
     getPaymentById,
-    getPaymentListByTenant
+    getPaymentListByTenant,
+    changePaymentStatus
 };

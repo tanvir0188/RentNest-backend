@@ -4,6 +4,7 @@ import { prisma } from "../../lib/prisma";
 import { AppError } from "../../errors/AppError";
 import { Request, Response } from "express";
 import { PaymentStatus, RequestStatus } from "../../../generated/prisma/enums";
+import httpStatus from "http-status";
 
 const stripe = new Stripe(config.stripe_secret_key);
 
@@ -201,9 +202,32 @@ const getPaymentListDB = async (userId: string, role: string) => {
     return payments;
 }
 
+const changePaymentStatusDB = async (paymentId: string, status: string) => {
+    const validStatuses = Object.values(PaymentStatus);
+    if (!validStatuses.includes(status as PaymentStatus)) {
+        throw new AppError(httpStatus.BAD_REQUEST, `Invalid payment status. Valid statuses are: ${validStatuses.join(', ')}`);
+    }
+
+    const payment = await prisma.payment.findUnique({
+        where: { id: paymentId }
+    });
+
+    if (!payment) {
+        throw new AppError(httpStatus.NOT_FOUND, "Payment not found");
+    }
+
+    const updatedPayment = await prisma.payment.update({
+        where: { id: paymentId },
+        data: { status: status as PaymentStatus }
+    });
+
+    return updatedPayment;
+}
+
 export const paymentService = {
     createCheckoutSessionStripe,
     listenWebhookAndStoreIntoDB,
     getPaymentByIdDB,
-    getPaymentListDB
+    getPaymentListDB,
+    changePaymentStatusDB
 };

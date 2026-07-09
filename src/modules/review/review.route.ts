@@ -6,6 +6,12 @@ import { validateCreateReview } from "./review.validation";
 
 const router = Router();
 
+// TENANT ROUTES
 router.post("/", auth(Role.TENANT), validateCreateReview, reviewController.createReview);
+router.patch("/:id", auth(Role.TENANT), reviewController.updateReview);
+
+// ADMIN ROUTES
+router.post("/admin", auth(Role.ADMIN), validateCreateReview, reviewController.createReview);
+router.patch("/admin/:id", auth(Role.ADMIN), reviewController.updateReview);
 
 export const reviewRoutes = router;

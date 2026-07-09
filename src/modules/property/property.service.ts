@@ -1,6 +1,8 @@
 import { Prisma } from "../../../generated/prisma/client";
+import { Role } from "../../../generated/prisma/enums";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
+import httpStatus from "http-status";
 import { CreatePropertyPayload, UpdatePropertyPayload, type CategoryPayload } from "./property.interface";
 
 const getAllProperties = async (filters: any, options: any) => {
@@ -141,14 +143,26 @@ const createProperty = async (payload: CreatePropertyPayload, landLordId: string
 const updateProperty = async (id: string, payload: UpdatePropertyPayload, userId: string, role: string) => {
     const property = await prisma.property.findUnique({ where: { id } });
     if (!property) {
-        throw new AppError(404, "Property not found");
+        throw new AppError(httpStatus.NOT_FOUND, "Property not found");
     }
 
-    if (property.landLordId !== userId && role !== "ADMIN") {
-        throw new AppError(403, "You do not have permission to update this property");
+    if (role === Role.ADMIN) {
+        if (payload.landLordId) {
+            const landlordUser = await prisma.user.findUnique({
+                where: { id: payload.landLordId }
+            });
+            if (!landlordUser) {
+                throw new AppError(httpStatus.BAD_REQUEST, "The provided landlord user ID does not exist");
+            }
+            if (landlordUser.role !== Role.LANDLORD) {
+                throw new AppError(httpStatus.BAD_REQUEST, "The provided user ID does not belong to a user with the LANDLORD role");
+            }
+        }
+    } else if (property.landLordId !== userId) {
+        throw new AppError(httpStatus.FORBIDDEN, "You do not have permission to update this property");
     }
 
-    const { amenities, ...propertyData } = payload;
+    const { amenities, landLordId, ...propertyData } = payload;
 
     const result = await prisma.property.update({
         where: { id },

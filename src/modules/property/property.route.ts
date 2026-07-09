@@ -18,8 +18,8 @@ router.get("/amenities", propertyController.getAllAmenities);
 
 router.get("/landlord/properties", auth(Role.LANDLORD), propertyController.getPropertiesForLandlord);
 router.post("/landlord/properties", auth(Role.LANDLORD), validateCreateProperty, propertyController.createProperty);
-router.put("/landlord/properties/:id", auth(Role.LANDLORD), propertyController.updateProperty);
-router.delete("/landlord/properties/:id", auth(Role.LANDLORD), propertyController.deleteProperty);
+router.put("/landlord/properties/:id", auth(Role.LANDLORD, Role.ADMIN), propertyController.updateProperty);
+router.delete("/landlord/properties/:id", auth(Role.LANDLORD, Role.ADMIN), propertyController.deleteProperty);
 
 // ADMIN ROUTES
 

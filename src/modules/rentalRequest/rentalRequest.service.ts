@@ -1,13 +1,26 @@
-import { RequestStatus } from "../../../generated/prisma/enums";
+import { RequestStatus, Role } from "../../../generated/prisma/enums";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
+import httpStatus from "http-status";
 
-const createRentalRequestIntoDB = async (userId: string, propertyId: string) => {
+const createRentalRequestIntoDB = async (userId: string, propertyId: string, role: string) => {
     const property = await prisma.property.findUnique({
         where: { id: propertyId }
     });
     if (!property) {
-        throw new AppError(404, "Property not found");
+        throw new AppError(httpStatus.NOT_FOUND, "Property not found");
+    }
+    
+    if (role === Role.ADMIN) {
+        const tenantUser = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+        if (!tenantUser) {
+            throw new AppError(httpStatus.BAD_REQUEST, "The provided user ID does not exist");
+        }
+        if (tenantUser.role !== Role.TENANT) {
+            throw new AppError(httpStatus.BAD_REQUEST, "The provided user ID does not belong to a user with the TENANT role");
+        }
     }
 
     const existingRequest = await prisma.rentalRequest.findUnique({
@@ -17,7 +30,7 @@ const createRentalRequestIntoDB = async (userId: string, propertyId: string) => 
     });
 
     if (existingRequest) {
-        throw new AppError(400, "You have already sent a request for this property");
+        throw new AppError(httpStatus.BAD_REQUEST, "A rental request already exists for this user and property");
     }
 
     const request = await prisma.rentalRequest.create({
@@ -123,7 +136,7 @@ const getAllRentalRequestFromDb = async () => {
     return result;
 }
 
-const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, status: RequestStatus) => {
+const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, status: RequestStatus, role: string) => {
     const rentalRequest = await prisma.rentalRequest.findUnique({
         where: { id: requestId },
         include: {
@@ -136,15 +149,16 @@ const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, 
     });
 
     if (!rentalRequest) {
-        throw new AppError(404, "Rental request not found");
+        throw new AppError(httpStatus.NOT_FOUND, "Rental request not found");
     }
 
-    if (rentalRequest.property.landLordId !== userId) {
-        throw new AppError(403, "You are not authorized to perform this action");
+    // Admin can accept/reject any request; landlord can only modify their own
+    if (role !== Role.ADMIN && rentalRequest.property.landLordId !== userId) {
+        throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to perform this action");
     }
 
     if (rentalRequest.status !== RequestStatus.PENDING) {
-        throw new AppError(400, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
+        throw new AppError(httpStatus.BAD_REQUEST, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
     }
 
     const updatedRequest = await prisma.rentalRequest.update({

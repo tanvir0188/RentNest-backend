@@ -17,6 +17,8 @@ router.patch("/landlord/requests/complete/:id/", auth(Role.LANDLORD), rentalRequ
 
 // ADMIN ROUTES
 router.get("/admin/rentals", auth(Role.ADMIN), rentalRequestController.getAllRequests);
+router.post("/admin/rentals", auth(Role.ADMIN), rentalRequestController.createRentalRequest);
+router.patch("/admin/rentals/:id", auth(Role.ADMIN), validateAcceptRejectRequest, rentalRequestController.acceptOrRejectRentalRequest);
 
 // SHARED ROUTES
 router.get("/rentals/:id", auth(Role.LANDLORD, Role.TENANT, Role.ADMIN), rentalRequestController.getRentalRequestDetail);
