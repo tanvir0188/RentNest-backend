@@ -37,7 +37,7 @@ const createCheckoutSessionStripe = async (userId: string, rentalRequestId: stri
         name: user.name,
     });
 
-    const amountInCents = Math.round(price * 100);
+    const amountInCents = Math.round(price);
 
     const session = await stripe.checkout.sessions.create({
         customer: customer.id,
@@ -124,7 +124,7 @@ const listenWebhookAndStoreIntoDB = async (req: Request, res: Response) => {
     res.status(200).send('Webhook received successfully');
 }
 
-const getPaymentByIdDB = async (id: string, userId: string) => {
+const getPaymentByIdDB = async (id: string, userId: string, role: string) => {
     const payment = await prisma.payment.findUnique({
         where: { id: id },
         include: {
@@ -154,17 +154,17 @@ const getPaymentByIdDB = async (id: string, userId: string) => {
         throw new AppError(404, "Payment not found");
     }
 
-    // users who did not create the payment should not access it
-    if (payment.userId !== userId) {
+    // users who did not create the payment should not access it, unless they are ADMIN
+    if (role !== 'ADMIN' && payment.userId !== userId) {
         throw new AppError(403, "You are not authorized to view this payment");
     }
 
     return payment;
 }
 
-const getPaymentByTenantDB = async (userId: string) => {
+const getPaymentListDB = async (userId: string, role: string) => {
     const payments = await prisma.payment.findMany({
-        where: { userId: userId },
+        where: role === 'ADMIN' ? {} : { userId: userId },
         include: {
             rentalRequest: {
                 select: {
@@ -194,5 +194,5 @@ export const paymentService = {
     createCheckoutSessionStripe,
     listenWebhookAndStoreIntoDB,
     getPaymentByIdDB,
-    getPaymentByTenantDB
+    getPaymentListDB
 };

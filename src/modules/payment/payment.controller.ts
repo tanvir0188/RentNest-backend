@@ -25,7 +25,8 @@ const handleWebhook = catchAsync(async (req: Request, res: Response, next: NextF
 const getPaymentById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id as string;
     const userId = req.user?.id as string;
-    const result = await paymentService.getPaymentByIdDB(id, userId);
+    const role = req.user?.role as string;
+    const result = await paymentService.getPaymentByIdDB(id, userId, role);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -34,9 +35,10 @@ const getPaymentById = catchAsync(async (req: Request, res: Response, next: Next
     });
 });
 
-const getPaymentByTenant = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const getPaymentListByTenant = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
-    const result = await paymentService.getPaymentByTenantDB(userId);
+    const role = req.user?.role as string;
+    const result = await paymentService.getPaymentListDB(userId, role);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -49,5 +51,5 @@ export const paymentController = {
     createCheckoutSession,
     handleWebhook,
     getPaymentById,
-    getPaymentByTenant
+    getPaymentListByTenant
 };
