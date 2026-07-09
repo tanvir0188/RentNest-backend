@@ -21,7 +21,8 @@ const createCheckoutSessionStripe = async (userId: string, rentalRequestId: stri
                     price: true,
                     title: true
                 }
-            }
+            },
+            status: true
         }
     });
 
@@ -41,6 +42,9 @@ const createCheckoutSessionStripe = async (userId: string, rentalRequestId: stri
 
     if (existingPayment) {
         throw new AppError(400, "Payment has already been made for this rental request.");
+    }
+    if (rentalRequest.status !== RequestStatus.APPROVED) {
+        throw new AppError(400, "Rental request is not approved");
     }
     const price = rentalRequest.property.price;
     console.log('price from db', price)

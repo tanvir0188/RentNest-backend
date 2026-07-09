@@ -32,8 +32,8 @@ const getAllProperties = async (filters: any, options: any) => {
 
     if (price) {
         andConditions.push({
-            price: {
-                equals: Number(price)
+            price: {               
+                lte: Number(price)                
             }
         });
     }

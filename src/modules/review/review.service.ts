@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
-import { PaymentStatus, Role } from "../../../generated/prisma/enums";
+import { PaymentStatus, RequestStatus, Role } from "../../../generated/prisma/enums";
 import { IReviewCreatePayload } from "./review.interface";
 
 const createReviewDB = async (userId: string, role: string, data: IReviewCreatePayload) => {
@@ -28,7 +28,7 @@ const createReviewDB = async (userId: string, role: string, data: IReviewCreateP
 
     const rentalRequest = await prisma.rentalRequest.findUnique({
         where: { id: rentalRequestId },
-        include: { payment: true }
+        include: { payment: true },
     });
 
     if (!rentalRequest) {
@@ -42,6 +42,9 @@ const createReviewDB = async (userId: string, role: string, data: IReviewCreateP
 
     if (!rentalRequest.payment || rentalRequest.payment.status !== PaymentStatus.SUCCESS) {
         throw new AppError(httpStatus.BAD_REQUEST, "You can only review properties for which the rental request payment has been completed");
+    }
+    if (rentalRequest.status !== RequestStatus.COMPLETED) {
+        throw new AppError(httpStatus.BAD_REQUEST, "You can only review properties for which the rental request is completed");
     }
 
     const existingReview = await prisma.review.findUnique({

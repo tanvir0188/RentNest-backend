@@ -20,13 +20,13 @@ export const validateAddAmenity = (req: Request, res: Response, next: NextFuncti
 };
 
 export const validateCreateCategory = (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.body;
-    if (!name) return next(new AppError(httpStatus.BAD_REQUEST, "Valid category name is required"));
+    const { title } = req.body;
+    if (!title) return next(new AppError(httpStatus.BAD_REQUEST, "Valid category title is required"));
     next();
 };
 
 export const validateCreateAmenity = (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.body;
-    if (!name) return next(new AppError(httpStatus.BAD_REQUEST, "Valid amenity name is required"));
+    const { title } = req.body;
+    if (!title) return next(new AppError(httpStatus.BAD_REQUEST, "Valid amenity title is required"));
     next();
 };
