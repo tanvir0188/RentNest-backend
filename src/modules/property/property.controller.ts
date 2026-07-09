@@ -9,6 +9,7 @@ const getAllProperties = catchAsync(async (req: Request, res: Response, next: Ne
         location: req.query.location,
         price: req.query.price,
         type: req.query.type,
+        amenity: req.query.amenity
     };
 
     const options = {
@@ -44,6 +45,18 @@ const getPropertyDetails = catchAsync(async (req: Request, res: Response, next: 
     });
 });
 
+const getPropertiesForLandlord = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const landLordId = req.user?.id;
+    const result = await propertyService.getPropertiesForLandlord(landLordId as string);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Properties fetched successfully",
+        data: result
+    });
+});
+
 const createProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const landLordId = req.user?.id; 
     console.log("Landlord ID:", landLordId); 
@@ -59,7 +72,8 @@ const createProperty = catchAsync(async (req: Request, res: Response, next: Next
 
 const updateProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params as { id: string };
-    const result = await propertyService.updateProperty(id, req.body);
+    const user = req.user as any;
+    const result = await propertyService.updateProperty(id, req.body, user.id, user.role);
 
     sendResponse(res, {
         success: true,
@@ -71,7 +85,8 @@ const updateProperty = catchAsync(async (req: Request, res: Response, next: Next
 
 const deleteProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params as { id: string };
-    const result = await propertyService.deleteProperty(id);
+    const user = req.user as any;
+    const result = await propertyService.deleteProperty(id, user.id, user.role);
 
     sendResponse(res, {
         success: true,
@@ -152,6 +167,7 @@ const getAllAmenities = catchAsync(async (req: Request, res: Response, next: Nex
 export const propertyController = {
     getAllProperties,
     getPropertyDetails,
+    getPropertiesForLandlord,
     createProperty,
     updateProperty,
     deleteProperty,

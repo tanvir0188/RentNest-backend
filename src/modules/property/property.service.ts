@@ -49,7 +49,7 @@ const getAllProperties = async (filters: any, options: any) => {
                 select: {
                     id: true,
                     name: true,
-                    email: true                    
+                    email: true
                 }
             },
             amenities: true,
@@ -98,6 +98,19 @@ const getPropertyDetails = async (id: string) => {
 
 };
 
+const getPropertiesForLandlord = async (landLordId: string) => {
+    const properties = await prisma.property.findMany({
+        where: { landLordId },
+        include: {
+            category: true,
+            amenities: true,
+            reviews: true
+        }
+    });
+    return properties;
+};
+
+
 const createProperty = async (payload: CreatePropertyPayload, landLordId: string) => {
     const { amenities, ...propertyData } = payload;
     const result = await prisma.property.create({
@@ -115,10 +128,14 @@ const createProperty = async (payload: CreatePropertyPayload, landLordId: string
     return result;
 };
 
-const updateProperty = async (id: string, payload: UpdatePropertyPayload) => {
+const updateProperty = async (id: string, payload: UpdatePropertyPayload, userId: string, role: string) => {
     const property = await prisma.property.findUnique({ where: { id } });
     if (!property) {
         throw new AppError(404, "Property not found");
+    }
+
+    if (property.landLordId !== userId && role !== "ADMIN") {
+        throw new AppError(403, "You do not have permission to update this property");
     }
 
     const { amenities, ...propertyData } = payload;
@@ -138,10 +155,14 @@ const updateProperty = async (id: string, payload: UpdatePropertyPayload) => {
     return result;
 };
 
-const deleteProperty = async (id: string) => {
+const deleteProperty = async (id: string, userId: string, role: string) => {
     const property = await prisma.property.findUnique({ where: { id } });
     if (!property) {
         throw new AppError(404, "Property not found");
+    }
+
+    if (property.landLordId !== userId && role !== "ADMIN") {
+        throw new AppError(403, "You do not have permission to delete this property");
     }
 
     const result = await prisma.property.delete({
@@ -204,6 +225,7 @@ const getAllCategories = async () => {
 };
 
 const createAmenity = async (payload: { title: string }) => {
+    console.log("payload: ", payload);
     const isExist = await prisma.amenity.findUnique({
         where: { title: payload.title }
     });
@@ -224,6 +246,7 @@ const getAllAmenities = async () => {
 export const propertyService = {
     getAllProperties,
     getPropertyDetails,
+    getPropertiesForLandlord,
     createProperty,
     updateProperty,
     deleteProperty,

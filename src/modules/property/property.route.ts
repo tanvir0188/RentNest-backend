@@ -15,9 +15,11 @@ router.get("/amenities", propertyController.getAllAmenities);
 
 // LANDLORD ROUTES
 
+router.get("/landlord/properties", auth(Role.LANDLORD), propertyController.getPropertiesForLandlord);
 router.post("/landlord/properties", auth(Role.LANDLORD), propertyController.createProperty);
 router.put("/landlord/properties/:id", auth(Role.LANDLORD), propertyController.updateProperty);
 router.delete("/landlord/properties/:id", auth(Role.LANDLORD), propertyController.deleteProperty);
+
 
 
 // ADMIN ROUTES
@@ -25,7 +27,6 @@ router.delete("/landlord/properties/:id", auth(Role.LANDLORD), propertyControlle
 router.post("/admin/category", auth(Role.ADMIN), propertyController.createCategory);
 router.put("/admin/category/:id", auth(Role.ADMIN), propertyController.updateCategory);
 router.delete("/admin/category/:id", auth(Role.ADMIN), propertyController.deleteCategory);
-
 router.post("/admin/amenity", auth(Role.ADMIN), propertyController.createAmenity);
 
 export const propertyRoutes = router;
