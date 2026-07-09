@@ -6,9 +6,16 @@ import { Role } from "../../../generated/prisma/enums";
 const router = Router();
 
 // ==============================
-// TENANT ROUTES
+// TENANT & ADMIN ROUTES
 // ==============================
-router.post("/checkout-session", auth(Role.TENANT), paymentController.createCheckoutSession);
+router.post("/checkout-session/:id", auth(Role.TENANT), paymentController.createCheckoutSession);
+router.get("/payments/:id", auth(Role.TENANT, Role.ADMIN), paymentController.getPaymentById);
+router.get("/payments", auth(Role.TENANT, Role.ADMIN), paymentController.getPaymentListByTenant);
+
+// ==============================
+// ADMIN ROUTES
+// ==============================
+router.patch("/admin/payments/:id/status", auth(Role.ADMIN), paymentController.changePaymentStatus);
 
 // ==============================
 // PUBLIC ROUTES (Webhook)

@@ -6,11 +6,10 @@ import { rentalRequestService } from "./rentalRequest.service";
 import type { RequestStatus } from "../../../generated/prisma/enums";
 
 const createRentalRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.id as string;
-    const { propertyId } = req.body;
-
-    const result = await rentalRequestService.createRentalRequestIntoDB(userId, propertyId);
-
+    const role = req.user?.role as string;    
+    const userId = role === 'ADMIN' ? req.body.userId : req.user?.id as string;
+    const propertyId: string = role === 'ADMIN' ? req.body.propertyId : req.params.id as string;
+    const result = await rentalRequestService.createRentalRequestIntoDB(userId, propertyId, role);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
@@ -65,12 +64,25 @@ const getAllRequests = catchAsync(async (req: Request, res: Response, next: Next
 const acceptOrRejectRentalRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const requestId = req.params.id as string;
     const userId = req.user?.id as string;
+    const role = req.user?.role as string;
     const status = req.body.status as RequestStatus;
-    const result = await rentalRequestService.acceptOrRejectRentalRequestDB(requestId, userId, status);
+    const result = await rentalRequestService.acceptOrRejectRentalRequestDB(requestId, userId, status, role);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: `Rental request ${status} successfully`,
+        data: result
+    });
+});
+
+const markAsCompleted = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const requestId = req.params.id as string;
+    const userId = req.user?.id as string;
+    const result = await rentalRequestService.markAsCompletedDB(requestId, userId);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: `Rental request marked as completed successfully`,
         data: result
     });
 });
@@ -81,6 +93,7 @@ export const rentalRequestController = {
     getAllRentalRequestsByLandLord,
     getRentalRequestDetail,
     getAllRequests,
-    acceptOrRejectRentalRequest
+    acceptOrRejectRentalRequest,
+    markAsCompleted
 };
 

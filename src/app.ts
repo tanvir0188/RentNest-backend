@@ -9,6 +9,7 @@ import { userRoutes } from "./modules/user/user.route";
 import { propertyRoutes } from "./modules/property/property.route";
 import { rentalRequestRoutes } from "./modules/rentalRequest/rentalRequest.route";
 import { paymentRoutes } from "./modules/payment/payment.route";
+import { reviewRoutes } from "./modules/review/review.route";
 
 
 
@@ -69,12 +70,21 @@ const endpointSecret = config.stripe_webhook_secret;
 //     response.send();
 // })
 
-app.use("/api/payment/webhook", express.raw({ type: 'application/json' }))
+app.use("/api/webhook", express.raw({ type: 'application/json' }))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+
+app.use((req: Request, res: Response, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(`Timestamp: ${new Date().toISOString()}, Method: ${req.method}, URL: ${req.originalUrl}, HTTP Version: ${req.httpVersion}, Status Code: ${res.statusCode}, Duration: ${duration}ms`);
+    });
+    next();
+});
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello, World!");
@@ -86,7 +96,8 @@ app.use("/api/users", userRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api", propertyRoutes)
 app.use("/api", rentalRequestRoutes)
-app.use("/api/payment", paymentRoutes)
+app.use("/api", paymentRoutes)
+app.use("/api/reviews", reviewRoutes)
 
 // app.use((req : Request, res : Response) => {
 //     res.status(404).json({

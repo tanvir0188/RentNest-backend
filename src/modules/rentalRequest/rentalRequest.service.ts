@@ -1,13 +1,36 @@
-import { RequestStatus } from "../../../generated/prisma/enums";
+import { RequestStatus, Role } from "../../../generated/prisma/enums";
 import { AppError } from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
+import httpStatus from "http-status";
 
-const createRentalRequestIntoDB = async (userId: string, propertyId: string) => {
+const createRentalRequestIntoDB = async (userId: string, propertyId: string, role: string) => {
     const property = await prisma.property.findUnique({
         where: { id: propertyId }
     });
     if (!property) {
-        throw new AppError(404, "Property not found");
+        throw new AppError(httpStatus.NOT_FOUND, "Property not found");
+    }
+    
+    if (role === Role.ADMIN) {
+        const tenantUser = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+        if (!tenantUser) {
+            throw new AppError(httpStatus.BAD_REQUEST, "The provided user ID does not exist");
+        }
+        if (tenantUser.role !== Role.TENANT) {
+            throw new AppError(httpStatus.BAD_REQUEST, "The provided user ID does not belong to a user with the TENANT role");
+        }
+    }
+
+    const existingRequest = await prisma.rentalRequest.findUnique({
+        where: {
+            userId_propertyId: { userId, propertyId },
+        },
+    });
+
+    if (existingRequest) {
+        throw new AppError(httpStatus.BAD_REQUEST, "A rental request already exists for this user and property");
     }
 
     const request = await prisma.rentalRequest.create({
@@ -75,6 +98,14 @@ const getRentalRequestDetailDB = async (requestId: string) => {
                     email: true,
                 }
             },
+            payment: {
+                select: {
+                    status: true,
+                    amount: true,
+                    createdAt: true
+
+                }
+            }
 
         }
     });
@@ -105,7 +136,7 @@ const getAllRentalRequestFromDb = async () => {
     return result;
 }
 
-const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, status: RequestStatus) => {
+const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, status: RequestStatus, role: string) => {
     const rentalRequest = await prisma.rentalRequest.findUnique({
         where: { id: requestId },
         include: {
@@ -118,15 +149,16 @@ const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, 
     });
 
     if (!rentalRequest) {
-        throw new AppError(404, "Rental request not found");
+        throw new AppError(httpStatus.NOT_FOUND, "Rental request not found");
     }
 
-    if (rentalRequest.property.landLordId !== userId) {
-        throw new AppError(403, "You are not authorized to perform this action");
+    // Admin can accept/reject any request; landlord can only modify their own
+    if (role !== Role.ADMIN && rentalRequest.property.landLordId !== userId) {
+        throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to perform this action");
     }
 
     if (rentalRequest.status !== RequestStatus.PENDING) {
-        throw new AppError(400, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
+        throw new AppError(httpStatus.BAD_REQUEST, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
     }
 
     const updatedRequest = await prisma.rentalRequest.update({
@@ -138,11 +170,47 @@ const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, 
     return updatedRequest.status;
 }
 
+//if the user has successfully made the payment, then mark the request as complete
+const markAsCompletedDB = async (requestId: string, landLordId: string) => {
+    const rentalRequest = await prisma.rentalRequest.findUnique({
+        where: { id: requestId },
+        include: { property: true }
+    });
+
+    if (!rentalRequest) {
+        throw new AppError(404, "Rental request not found");
+    }
+
+    if (rentalRequest.property.landLordId !== landLordId) {
+        throw new AppError(403, "You are not authorized to modify this request");
+    }
+
+    if (rentalRequest.status === RequestStatus.COMPLETED) {
+        throw new AppError(400, "Cannot mark as completed because the request is already completed");
+    }
+    if (rentalRequest.status === RequestStatus.REJECTED) {
+        throw new AppError(400, "Cannot mark as completed because the request is rejected");
+    }
+    if (rentalRequest.status === RequestStatus.PENDING) {
+        throw new AppError(400, "Cannot mark as completed because the request is pending");
+    }
+
+    const updatedRequest = await prisma.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+            status: RequestStatus.COMPLETED
+        }
+    });
+
+    return updatedRequest;
+}
+
 export const rentalRequestService = {
     createRentalRequestIntoDB,
     getAllRentalRequestsFromDBByUserId,
     getRentalRequestDetailDB,
     getAllRentalRequestFromDb,
     getRentalRequestsForLandLordDB,
-    acceptOrRejectRentalRequestDB
+    acceptOrRejectRentalRequestDB,
+    markAsCompletedDB
 };
