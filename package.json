@@ -11,7 +11,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "stripe:webhook": "stripe listen --forward-to localhost:5000/api/subscription/webhook",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "prisma generate"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/adapter-neon": "^7.8.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
