@@ -2,6 +2,7 @@ import { Router } from "express";
 import { rentalRequestController } from "./rentalRequest.controller";
 import { auth } from "../../middlewares/auth";
 import { Role } from "../../../generated/prisma/enums";
+import { validateAcceptRejectRequest } from "./rentalRequest.validation";
 
 const router = Router();
 
@@ -11,7 +12,7 @@ router.get("/rentals", auth(Role.TENANT), rentalRequestController.getAllRentalRe
 
 // LANDLORD ROUTES
 router.get("/landlord/requests", auth(Role.LANDLORD), rentalRequestController.getAllRentalRequestsByLandLord);
-router.patch("/landlord/requests/:id", auth(Role.LANDLORD), rentalRequestController.acceptOrRejectRentalRequest);
+router.patch("/landlord/requests/:id", auth(Role.LANDLORD), validateAcceptRejectRequest, rentalRequestController.acceptOrRejectRentalRequest);
 router.patch("/landlord/requests/complete/:id/", auth(Role.LANDLORD), rentalRequestController.markAsCompleted);
 
 // ADMIN ROUTES
