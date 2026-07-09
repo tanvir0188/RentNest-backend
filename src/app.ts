@@ -9,6 +9,7 @@ import { userRoutes } from "./modules/user/user.route";
 import { propertyRoutes } from "./modules/property/property.route";
 import { rentalRequestRoutes } from "./modules/rentalRequest/rentalRequest.route";
 import { paymentRoutes } from "./modules/payment/payment.route";
+import { reviewRoutes } from "./modules/review/review.route";
 
 
 
@@ -96,6 +97,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api", propertyRoutes)
 app.use("/api", rentalRequestRoutes)
 app.use("/api", paymentRoutes)
+app.use("/api/reviews", reviewRoutes)
 
 // app.use((req : Request, res : Response) => {
 //     res.status(404).json({

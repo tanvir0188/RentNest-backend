@@ -126,7 +126,7 @@ const listenWebhookAndStoreIntoDB = async (req: Request, res: Response) => {
             await tx.rentalRequest.update({
                 where: { id: rentalRequestId },
                 data: {
-                    status: RequestStatus.APPROVED,
+                    status: RequestStatus.ACTIVE,
                 },
             });
         });

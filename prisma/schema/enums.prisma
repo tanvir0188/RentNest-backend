@@ -12,6 +12,8 @@ enum Role {
 enum RequestStatus {
   PENDING
   APPROVED
+  ACTIVE
+  COMPLETED
   REJECTED
 }
 

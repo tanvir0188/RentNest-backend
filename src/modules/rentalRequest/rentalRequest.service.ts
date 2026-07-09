@@ -156,11 +156,47 @@ const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, 
     return updatedRequest.status;
 }
 
+//if the user has successfully made the payment, then mark the request as complete
+const markAsCompletedDB = async (requestId: string, landLordId: string) => {
+    const rentalRequest = await prisma.rentalRequest.findUnique({
+        where: { id: requestId },
+        include: { property: true }
+    });
+
+    if (!rentalRequest) {
+        throw new AppError(404, "Rental request not found");
+    }
+
+    if (rentalRequest.property.landLordId !== landLordId) {
+        throw new AppError(403, "You are not authorized to modify this request");
+    }
+
+    if (rentalRequest.status === RequestStatus.COMPLETED) {
+        throw new AppError(400, "Cannot mark as completed because the request is already completed");
+    }
+    if (rentalRequest.status === RequestStatus.REJECTED) {
+        throw new AppError(400, "Cannot mark as completed because the request is rejected");
+    }
+    if (rentalRequest.status === RequestStatus.PENDING) {
+        throw new AppError(400, "Cannot mark as completed because the request is pending");
+    }
+
+    const updatedRequest = await prisma.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+            status: RequestStatus.COMPLETED
+        }
+    });
+
+    return updatedRequest;
+}
+
 export const rentalRequestService = {
     createRentalRequestIntoDB,
     getAllRentalRequestsFromDBByUserId,
     getRentalRequestDetailDB,
     getAllRentalRequestFromDb,
     getRentalRequestsForLandLordDB,
-    acceptOrRejectRentalRequestDB
+    acceptOrRejectRentalRequestDB,
+    markAsCompletedDB
 };

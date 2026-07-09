@@ -73,12 +73,25 @@ const acceptOrRejectRentalRequest = catchAsync(async (req: Request, res: Respons
     });
 });
 
+const markAsCompleted = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const requestId = req.params.id as string;
+    const userId = req.user?.id as string;
+    const result = await rentalRequestService.markAsCompletedDB(requestId, userId);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: `Rental request marked as completed successfully`,
+        data: result
+    });
+});
+
 export const rentalRequestController = {
     createRentalRequest,
     getAllRentalRequestsByTenant,
     getAllRentalRequestsByLandLord,
     getRentalRequestDetail,
     getAllRequests,
-    acceptOrRejectRentalRequest
+    acceptOrRejectRentalRequest,
+    markAsCompleted
 };
 

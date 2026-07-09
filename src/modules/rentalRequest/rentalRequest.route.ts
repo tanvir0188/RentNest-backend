@@ -12,6 +12,7 @@ router.get("/rentals", auth(Role.TENANT), rentalRequestController.getAllRentalRe
 // LANDLORD ROUTES
 router.get("/landlord/requests", auth(Role.LANDLORD), rentalRequestController.getAllRentalRequestsByLandLord);
 router.patch("/landlord/requests/:id", auth(Role.LANDLORD), rentalRequestController.acceptOrRejectRentalRequest);
+router.patch("/landlord/requests/complete/:id/", auth(Role.LANDLORD), rentalRequestController.markAsCompleted);
 
 // ADMIN ROUTES
 router.get("/admin/rentals", auth(Role.ADMIN), rentalRequestController.getAllRequests);

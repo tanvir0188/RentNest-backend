@@ -52,8 +52,7 @@ const getAllProperties = async (filters: any, options: any) => {
                     email: true
                 }
             },
-            amenities: true,
-            reviews: true
+            amenities: true
         }
     });
 
@@ -85,7 +84,18 @@ const getPropertyDetails = async (id: string) => {
                     profile: true
                 }
             },
-            reviews: true,
+            reviews: {
+                select: {
+                    id: true,
+                    rating: true,
+                    comment: true,
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
+            },
             amenities: true
         }
     });
