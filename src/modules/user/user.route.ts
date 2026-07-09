@@ -2,12 +2,13 @@ import { Router } from "express";
 import { Role } from "../../../generated/prisma/enums";
 import { auth } from "../../middlewares/auth";
 import { userController } from "./user.controller";
+import { validateRegister } from "./user.validation";
 
 const router = Router();
 
 // PUBLIC ROUTES
 
-router.post("/register", userController.registerUser);
+router.post("/register", validateRegister, userController.registerUser);
 
 // ADMIN ROUTES
 
