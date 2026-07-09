@@ -10,6 +10,16 @@ const createRentalRequestIntoDB = async (userId: string, propertyId: string) => 
         throw new AppError(404, "Property not found");
     }
 
+    const existingRequest = await prisma.rentalRequest.findUnique({
+        where: {
+            userId_propertyId: { userId, propertyId },
+        },
+    });
+
+    if (existingRequest) {
+        throw new AppError(400, "You have already sent a request for this property");
+    }
+
     const request = await prisma.rentalRequest.create({
         data: {
             userId,

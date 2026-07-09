@@ -7,10 +7,8 @@ import type { RequestStatus } from "../../../generated/prisma/enums";
 
 const createRentalRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
-    const { propertyId } = req.body;
-
+    const propertyId: string = req.params.id as string;
     const result = await rentalRequestService.createRentalRequestIntoDB(userId, propertyId);
-
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
