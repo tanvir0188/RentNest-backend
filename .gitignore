@@ -3,4 +3,3 @@ dist
 generated
 .env
 /generated/prisma
-dev.db
