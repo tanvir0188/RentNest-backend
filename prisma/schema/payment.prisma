@@ -17,7 +17,7 @@ model Payment {
     stripePaymentIntentId String @unique
 
     rentalRequestId String        @unique
-    rentalRequests  RentalRequest @relation(fields: [rentalRequestId], references: [id])
+    rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

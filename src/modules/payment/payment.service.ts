@@ -7,14 +7,30 @@ import { PaymentStatus, RequestStatus } from "../../../generated/prisma/enums";
 
 const stripe = new Stripe(config.stripe_secret_key);
 
-const createCheckoutSessionStripe = async (userId: string, price: number, rentalRequestId: string) => {
+const createCheckoutSessionStripe = async (userId: string, rentalRequestId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: userId }
+    });
+
+    const rentalRequest = await prisma.rentalRequest.findUnique({
+        where: { id: rentalRequestId },
+        select: {
+            property: {
+                select: {
+                    price: true,
+                    title: true
+                }
+            }
+        }
     });
 
     if (!user) {
         throw new AppError(404, "User not found");
     }
+    if (!rentalRequest) {
+        throw new AppError(404, "Rental request not found");
+    }
+    const price = rentalRequest.property.price;
 
     const customer = await stripe.customers.create({
         email: user.email,
@@ -28,10 +44,10 @@ const createCheckoutSessionStripe = async (userId: string, price: number, rental
         line_items: [
             {
                 price_data: {
-                    currency: 'usd',
+                    currency: 'bdt',
                     product_data: {
                         name: 'Rental Payment',
-                        description: `Payment for rental request ${rentalRequestId}`,
+                        description: `Payment for rental request ${rentalRequest.property.title}`,
                     },
                     unit_amount: amountInCents,
                 },
@@ -39,8 +55,8 @@ const createCheckoutSessionStripe = async (userId: string, price: number, rental
             },
         ],
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
+        success_url: `https://novel-fresh-spaniel.ngrok-free.app/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `https://novel-fresh-spaniel.ngrok-free.app/payment/cancel`,
         metadata: {
             userId,
             rentalRequestId,
@@ -108,7 +124,75 @@ const listenWebhookAndStoreIntoDB = async (req: Request, res: Response) => {
     res.status(200).send('Webhook received successfully');
 }
 
+const getPaymentByIdDB = async (id: string, userId: string) => {
+    const payment = await prisma.payment.findUnique({
+        where: { id: id },
+        include: {
+            rentalRequest: {
+                select: {
+                    createdAt: true,
+                    updatedAt: true,
+                    property: {
+                        select: {
+                            title: true,
+                            price: true,
+                            location: true,
+                        }
+                    },
+                    user: {
+                        select: {
+                            name: true,
+                            email: true,
+                        }
+                    },
+                }
+            }
+        }
+    });
+
+    if (!payment) {
+        throw new AppError(404, "Payment not found");
+    }
+
+    // users who did not create the payment should not access it
+    if (payment.userId !== userId) {
+        throw new AppError(403, "You are not authorized to view this payment");
+    }
+
+    return payment;
+}
+
+const getPaymentByTenantDB = async (userId: string) => {
+    const payments = await prisma.payment.findMany({
+        where: { userId: userId },
+        include: {
+            rentalRequest: {
+                select: {
+                    createdAt: true,
+                    updatedAt: true,
+                    property: {
+                        select: {
+                            title: true,
+                            price: true,
+                            location: true,
+                        }
+                    },
+                    user: {
+                        select: {
+                            name: true,
+                            email: true,
+                        }
+                    },
+                }
+            }
+        }
+    });
+    return payments;
+}
+
 export const paymentService = {
     createCheckoutSessionStripe,
-    listenWebhookAndStoreIntoDB
+    listenWebhookAndStoreIntoDB,
+    getPaymentByIdDB,
+    getPaymentByTenantDB
 };

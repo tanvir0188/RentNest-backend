@@ -8,7 +8,9 @@ const router = Router();
 // ==============================
 // TENANT ROUTES
 // ==============================
-router.post("/checkout-session", auth(Role.TENANT), paymentController.createCheckoutSession);
+router.post("/checkout-session/:id", auth(Role.TENANT), paymentController.createCheckoutSession);
+router.get("/payments/:id", auth(Role.TENANT), paymentController.getPaymentById);
+router.get("/payments", auth(Role.TENANT), paymentController.getPaymentByTenant);
 
 // ==============================
 // PUBLIC ROUTES (Webhook)
