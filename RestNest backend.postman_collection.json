@@ -1,0 +1,709 @@
+{
+	"info": {
+		"_postman_id": "b5e03464-4dfe-4897-85bc-3b0277fa3012",
+		"name": "RestNest backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40801750",
+		"_collection_link": "https://drewblon-test.postman.co/workspace/drewblon-test-Workspace~7e19b36a-cb29-48c1-8ee9-1a580d7d92c1/collection/40801750-b5e03464-4dfe-4897-85bc-3b0277fa3012?action=share&source=collection_link&creator=40801750"
+	},
+	"item": [
+		{
+			"name": "auth & profile",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Arnob tenant\",\n    \"email\":\"arnob01889@gmail.com\",\n    \"password\":\"arnob0188\",\n    \"role\":\"TENANT\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n    \"email\":\"arnob0188@land.com\",\n    \"password\":\"arnob0188\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n    \"email\":\"arnob018810@gmail.com\",\n    \"password\":\"arnob0188\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n    \"name\":\"admin\",\n    \"bio\":\"sadfsadf\"\n    \n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "landlord",
+			"item": [
+				{
+					"name": "property",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"price\": 3000,\r\n  \"title\": \"Modern 2 Bedroom Apartment\",\r\n  \"type\": \"Sublet\",\r\n  \"location\": \"Bashabo, Dhaka\",\r\n  \"categoryId\": \"27a03707-47ce-4f71-adce-2a2fc23d8047\",\r\n  \"isAvailable\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/landlord/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"properties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-property",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"price\": 25000,\r\n  \"title\": \"Modern 2 Bedroom Apartment\",\r\n  \"type\": \"Apartment\",\r\n  \"location\": \"Dhanmondi, Dhaka\",\r\n  \"categoryId\": \"f7393b74-e720-40dd-b48c-5d9bf0220e78\",\r\n  \"isAvailable\": true\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/landlord/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"properties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update property",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"price\": 25000,\r\n  \"title\": \"Updated Luxury Apartment\",\r\n  \"type\": \"Apartment\",\r\n  \"location\": \"Dhaka, Bangladesh\",\r\n  \"categoryId\": \"2e73b569-a157-446c-9d7a-64e36bf96fab\",\r\n  \"isAvailable\": true,\r\n  \"amenities\": [    \r\n    \"9010968c-65f9-4701-9887-a3211eee5063\"\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/landlord/properties/1c154c6f-8a14-4080-acda-79bf421baf9b",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"properties",
+								"1c154c6f-8a14-4080-acda-79bf421baf9b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rental requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/landlord/requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "accept or reject rental request",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\":\"APPROVED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/landlord/requests/b68f50f9-f8e2-4e20-b9cf-2a6b0ce3e1bb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"requests",
+								"b68f50f9-f8e2-4e20-b9cf-2a6b0ce3e1bb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "mark request as completed",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"price\": 25000,\r\n  \"title\": \"Modern 2 Bedroom Apartment\",\r\n  \"type\": \"Apartment\",\r\n  \"location\": \"Dhanmondi, Dhaka\",\r\n  \"categoryId\": \"f7393b74-e720-40dd-b48c-5d9bf0220e78\",\r\n  \"isAvailable\": true\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/landlord/requests/complete/b68f50f9-f8e2-4e20-b9cf-2a6b0ce3e1bb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"requests",
+								"complete",
+								"b68f50f9-f8e2-4e20-b9cf-2a6b0ce3e1bb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "public",
+			"item": [
+				{
+					"name": "property",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"price\": 25000,\r\n  \"title\": \"Modern 2 Bedroom Apartment\",\r\n  \"type\": \"Apartment\",\r\n  \"location\": \"Dhanmondi, Dhaka\",\r\n  \"categoryId\": \"f7393b74-e720-40dd-b48c-5d9bf0220e78\",\r\n  \"isAvailable\": true\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "property details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"price\": 25000,\r\n  \"title\": \"Modern 2 Bedroom Apartment\",\r\n  \"type\": \"Apartment\",\r\n  \"location\": \"Dhanmondi, Dhaka\",\r\n  \"categoryId\": \"f7393b74-e720-40dd-b48c-5d9bf0220e78\",\r\n  \"isAvailable\": true\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/1c154c6f-8a14-4080-acda-79bf421baf9b",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1c154c6f-8a14-4080-acda-79bf421baf9b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get amenity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/amenities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"amenities"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n    \"title\":\"Cat 3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/category",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amenity",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Cable\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/amenity",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"amenity"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rentals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/rentals/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"rentals",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant",
+			"item": [
+				{
+					"name": "rental request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/rentals/e8633e04-125a-43e1-b6a5-5d1d3f25d644",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"rentals",
+								"e8633e04-125a-43e1-b6a5-5d1d3f25d644"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "request list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/rentals/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"rentals",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stripe checkout session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/checkout-session/b68f50f9-f8e2-4e20-b9cf-2a6b0ce3e1bb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"checkout-session",
+								"b68f50f9-f8e2-4e20-b9cf-2a6b0ce3e1bb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rental request details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/rentals/d2493bfb-2270-43d2-8658-8bd684e6588b",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"rentals",
+								"d2493bfb-2270-43d2-8658-8bd684e6588b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\":5,\n    \"comment\":\"great accomationds and services\",\n    \"rentalRequestId\":\"d2493bfb-2270-43d2-8658-8bd684e6588b\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reviews/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payments",
+			"item": [
+				{
+					"name": "get payment history(for admin and tenant)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/payments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		}
+	]
+}
