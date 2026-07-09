@@ -23,7 +23,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"Arnob tenant\",\n    \"email\":\"arnob01889@gmail.com\",\n    \"password\":\"arnob0188\",\n    \"role\":\"TENANT\"\n}",
+							"raw": "{\n    \"name\":\"Arnob admin\",\n    \"email\":\"arnob0188@admin.com\"\n    \n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -156,7 +156,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"price\": 3000,\r\n  \"title\": \"Modern 2 Bedroom Apartment\",\r\n  \"type\": \"Sublet\",\r\n  \"location\": \"Bashabo, Dhaka\",\r\n  \"categoryId\": \"27a03707-47ce-4f71-adce-2a2fc23d8047\",\r\n  \"isAvailable\": true\r\n}",
+							"raw": "{\r\n  \"price\": 30000,\r\n  \"title\": \"Modern 5 Bedroom Apartment\",\r\n  \"type\": \"Sublet\",\r\n   \r\n  \"isAvailable\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -515,6 +515,66 @@
 								"admin",
 								"rentals",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "property",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"landLordId\":\"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/landlord/properties/1c154c6f-8a14-4080-acda-79bf421baf9b",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"landlord",
+								"properties",
+								"1c154c6f-8a14-4080-acda-79bf421baf9b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update review",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\":4,\n    \"comment\":\"great accomationds and services\",\n    \"rentalRequestId\":\"d2493bfb-2270-43d2-8658-8bd684e6588b\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reviews/admin/9e2535fd-2fca-4255-a8c9-5b99e9681b69",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"admin",
+								"9e2535fd-2fca-4255-a8c9-5b99e9681b69"
 							]
 						}
 					},
