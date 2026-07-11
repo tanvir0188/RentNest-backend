@@ -110,7 +110,24 @@ const updateReviewDB = async (reviewId: string, userId: string, role: string, da
     return updatedReview;
 };
 
+const deleteReviewDB = async (reviewId: string) => {
+    const review = await prisma.review.findUnique({
+        where: { id: reviewId }
+    });
+
+    if (!review) {
+        throw new AppError(httpStatus.NOT_FOUND, "Review not found");
+    }
+
+    const deletedReview = await prisma.review.delete({
+        where: { id: reviewId }
+    });
+
+    return deletedReview;
+};
+
 export const reviewService = {
     createReviewDB,
-    updateReviewDB
+    updateReviewDB,
+    deleteReviewDB
 };

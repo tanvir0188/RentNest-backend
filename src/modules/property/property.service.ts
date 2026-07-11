@@ -267,6 +267,41 @@ const getAllAmenities = async () => {
     return result;
 };
 
+const updateAmenity = async (id: string, payload: { title: string }) => {
+    const amenity = await prisma.amenity.findUnique({ where: { id } });
+    if (!amenity) {
+        throw new AppError(404, "Amenity not found");
+    }
+
+    if (payload.title) {
+        const isTitleExists = await prisma.amenity.findUnique({
+            where: { title: payload.title }
+        });
+
+        if (isTitleExists && isTitleExists.id !== id) {
+            throw new AppError(400, "Amenity with this title already exists");
+        }
+    }
+
+    const result = await prisma.amenity.update({
+        where: { id },
+        data: payload
+    });
+    return result;
+};
+
+const deleteAmenity = async (id: string) => {
+    const amenity = await prisma.amenity.findUnique({ where: { id } });
+    if (!amenity) {
+        throw new AppError(404, "Amenity not found");
+    }
+
+    const result = await prisma.amenity.delete({
+        where: { id }
+    });
+    return result;
+};
+
 export const propertyService = {
     getAllProperties,
     getPropertyDetails,
@@ -279,5 +314,7 @@ export const propertyService = {
     updateCategory,
     getAllCategories,
     createAmenity,
-    getAllAmenities
+    getAllAmenities,
+    updateAmenity,
+    deleteAmenity
 };

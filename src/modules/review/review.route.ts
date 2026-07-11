@@ -13,5 +13,6 @@ router.patch("/:id", auth(Role.TENANT), reviewController.updateReview);
 // ADMIN ROUTES
 router.post("/admin", auth(Role.ADMIN), validateCreateReview, reviewController.createReview);
 router.patch("/admin/:id", auth(Role.ADMIN), reviewController.updateReview);
+router.delete("/admin/:id", auth(Role.ADMIN), reviewController.deleteReview);
 
 export const reviewRoutes = router;

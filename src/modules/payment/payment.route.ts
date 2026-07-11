@@ -15,7 +15,7 @@ router.get("/payments", auth(Role.TENANT, Role.ADMIN), paymentController.getPaym
 // ==============================
 // ADMIN ROUTES
 // ==============================
-router.patch("/admin/payments/:id/status", auth(Role.ADMIN), paymentController.changePaymentStatus);
+router.patch("/admin/payments/status/:id", auth(Role.ADMIN), paymentController.changePaymentStatus);
 
 // ==============================
 // PUBLIC ROUTES (Webhook)

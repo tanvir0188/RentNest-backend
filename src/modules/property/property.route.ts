@@ -27,5 +27,7 @@ router.post("/admin/category", auth(Role.ADMIN), validateCreateCategory, propert
 router.put("/admin/category/:id", auth(Role.ADMIN), propertyController.updateCategory);
 router.delete("/admin/category/:id", auth(Role.ADMIN), propertyController.deleteCategory);
 router.post("/admin/amenity", auth(Role.ADMIN), validateCreateAmenity, propertyController.createAmenity);
+router.put("/admin/amenity/:id", auth(Role.ADMIN), propertyController.updateAmenity);
+router.delete("/admin/amenity/:id", auth(Role.ADMIN), propertyController.deleteAmenity);
 
 export const propertyRoutes = router;

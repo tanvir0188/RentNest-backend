@@ -164,6 +164,30 @@ const getAllAmenities = catchAsync(async (req: Request, res: Response, next: Nex
     });
 });
 
+const updateAmenity = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params as { id: string };
+    const result = await propertyService.updateAmenity(id, req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Amenity updated successfully",
+        data: result
+    });
+});
+
+const deleteAmenity = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params as { id: string };
+    const result = await propertyService.deleteAmenity(id);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Amenity deleted successfully",
+        data: result
+    });
+});
+
 export const propertyController = {
     getAllProperties,
     getPropertyDetails,
@@ -176,5 +200,7 @@ export const propertyController = {
     updateCategory,
     getAllCategories,
     createAmenity,
-    getAllAmenities
+    getAllAmenities,
+    updateAmenity,
+    deleteAmenity
 };
