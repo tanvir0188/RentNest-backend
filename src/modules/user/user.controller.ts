@@ -94,7 +94,7 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response, next: Nex
 
     const payload = req.body;
     if (payload.email) {
-        const emailExists = await userService.emailExistInDB(payload.email);
+        const emailExists = await userService.emailExistInDB(payload.email, userId);
         if (emailExists) {
             sendResponse(res, {
                 success: false,

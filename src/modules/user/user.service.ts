@@ -53,12 +53,12 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
 
     return user;
 }
-const emailExistInDB = async (email: string) => {
+const emailExistInDB = async (email: string, excludeUserId?: string) => {
     const user = await prisma.user.findUnique({
         where: { email }
     })
 
-    if (user) {
+    if (user && user.id !== excludeUserId) {
         return true;
     }
 
