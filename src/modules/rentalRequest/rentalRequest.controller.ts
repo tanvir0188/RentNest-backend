@@ -6,7 +6,7 @@ import { rentalRequestService } from "./rentalRequest.service";
 import type { RequestStatus } from "../../../generated/prisma/enums";
 
 const createRentalRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const role = req.user?.role as string;    
+    const role = req.user?.role as string;
     const userId = role === 'ADMIN' ? req.body.userId : req.user?.id as string;
     const propertyId: string = role === 'ADMIN' ? req.body.propertyId : req.params.id as string;
     const result = await rentalRequestService.createRentalRequestIntoDB(userId, propertyId, role);

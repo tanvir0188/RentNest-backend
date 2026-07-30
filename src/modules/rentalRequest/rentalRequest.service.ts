@@ -10,7 +10,7 @@ const createRentalRequestIntoDB = async (userId: string, propertyId: string, rol
     if (!property) {
         throw new AppError(httpStatus.NOT_FOUND, "Property not found");
     }
-    
+
     if (role === Role.ADMIN) {
         const tenantUser = await prisma.user.findUnique({
             where: { id: userId }

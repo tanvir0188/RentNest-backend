@@ -10,8 +10,7 @@ import { propertyRoutes } from "./modules/property/property.route";
 import { rentalRequestRoutes } from "./modules/rentalRequest/rentalRequest.route";
 import { paymentRoutes } from "./modules/payment/payment.route";
 import { reviewRoutes } from "./modules/review/review.route";
-
-
+import { overviewRoutes } from "./modules/overview/overview.route";
 
 const app: Application = express();
 
@@ -98,6 +97,7 @@ app.use("/api", propertyRoutes)
 app.use("/api", rentalRequestRoutes)
 app.use("/api", paymentRoutes)
 app.use("/api/reviews", reviewRoutes)
+app.use("/api", overviewRoutes)
 
 // app.use((req : Request, res : Response) => {
 //     res.status(404).json({
