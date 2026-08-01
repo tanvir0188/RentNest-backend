@@ -4,6 +4,7 @@ import { prisma } from "../../lib/prisma";
 import { RegisterUserPayload, UpdateProfilePayload } from "./user.interface";
 import { ActiveStatus, Role } from "../../../generated/prisma/enums";
 import { AppError } from "../../errors/AppError";
+import { get } from "node:http";
 
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
     const { name, email, role, password, profilePhoto } = payload;
@@ -145,6 +146,19 @@ const toggleUserActiveDB = async (userId: string) => {
     return updatedUser;
 }
 
+const getUserDetailsDB = async (userId: string) => {
+    const user = await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        omit: {
+            password: true
+        },
+        include: {
+            profile: true
+        }
+    });
+
+    return user;
+}
 
 export const userService = {
     registerUserIntoDB,
@@ -152,5 +166,6 @@ export const userService = {
     updateMyProfileInDB,
     emailExistInDB,
     getAllUsersFromDB,
-    toggleUserActiveDB
+    toggleUserActiveDB,
+    getUserDetailsDB
 }

@@ -137,10 +137,22 @@ const toggleUserStatus = catchAsync(async (req: Request, res: Response, next: Ne
     });
 })
 
+const getUserDetails = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params as { id: string };
+    const result = await userService.getUserDetailsDB(id);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User details fetched successfully",
+        data: result
+    });
+})
+
 export const userController = {
     registerUser,
     getMyProfile,
     updateMyProfile,
     getAllUsers,
-    toggleUserStatus
+    toggleUserStatus,
+    getUserDetails
 }

@@ -13,6 +13,7 @@ router.post("/register", validateRegister, userController.registerUser);
 // ADMIN ROUTES
 
 router.get("/", auth(Role.ADMIN), userController.getAllUsers);
+router.get("/:id", auth(Role.ADMIN), userController.getUserDetails);
 router.put("/admin/users/:id/toggle-status", auth(Role.ADMIN), userController.toggleUserStatus);
 
 
