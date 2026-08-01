@@ -43,11 +43,17 @@ const createRentalRequestIntoDB = async (userId: string, propertyId: string, rol
     return request;
 };
 
-const getAllRentalRequestsFromDBByUserId = async (userId: string) => {
+const getAllRentalRequestsFromDBByUserId = async (userId: string, options: any) => {
+    const { page = 1, size = 10 } = options || {};
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
     const result = await prisma.rentalRequest.findMany({
         where: {
             userId
         },
+        skip,
+        take,
         include: {
             property: {
                 select: {
@@ -58,16 +64,37 @@ const getAllRentalRequestsFromDBByUserId = async (userId: string) => {
             }
         }
     });
-    return result;
+
+    const total = await prisma.rentalRequest.count({
+        where: { userId }
+    });
+
+    return {
+        meta: {
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: result.length
+        },
+        data: result
+    };
 };
 
-const getRentalRequestsForLandLordDB = async (userId: string) => {
+const getRentalRequestsForLandLordDB = async (userId: string, options: any) => {
+    const { page = 1, size = 10 } = options || {};
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
+    const whereCondition = {
+        property: {
+            landLordId: userId
+        }
+    };
+
     const result = await prisma.rentalRequest.findMany({
-        where: {
-            property: {
-                landLordId: userId
-            }
-        },
+        where: whereCondition,
+        skip,
+        take,
         include: {
             property: {
                 select: {
@@ -78,7 +105,20 @@ const getRentalRequestsForLandLordDB = async (userId: string) => {
             }
         }
     });
-    return result;
+
+    const total = await prisma.rentalRequest.count({
+        where: whereCondition
+    });
+
+    return {
+        meta: {
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: result.length
+        },
+        data: result
+    };
 }
 
 const getRentalRequestDetailDB = async (requestId: string) => {
@@ -115,8 +155,14 @@ const getRentalRequestDetailDB = async (requestId: string) => {
     return request;
 }
 
-const getAllRentalRequestFromDb = async () => {
+const getAllRentalRequestFromDb = async (options: any) => {
+    const { page = 1, size = 10 } = options || {};
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
     const result = await prisma.rentalRequest.findMany({
+        skip,
+        take,
         include: {
             property: {
                 select: {
@@ -133,7 +179,18 @@ const getAllRentalRequestFromDb = async () => {
             },
         }
     });
-    return result;
+
+    const total = await prisma.rentalRequest.count();
+
+    return {
+        meta: {
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: result.length
+        },
+        data: result
+    };
 }
 
 const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, status: RequestStatus, role: string) => {
@@ -156,7 +213,8 @@ const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, 
     if (role !== Role.ADMIN && rentalRequest.property.landLordId !== userId) {
         throw new AppError(httpStatus.FORBIDDEN, "You are not authorized to perform this action");
     }
-
+    // Check if the request is already accepted or rejected(applies to landlord only)
+    
     if (rentalRequest.status !== RequestStatus.PENDING) {
         throw new AppError(httpStatus.BAD_REQUEST, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
     }

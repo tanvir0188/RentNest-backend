@@ -120,12 +120,17 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response, next: Nex
 })
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await userService.getAllUsersFromDB();
+    const options = {
+        page: req.query.page,
+        size: req.query.size,
+    };
+    const result = await userService.getAllUsersFromDB(options);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Users fetched successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     });
 })
 

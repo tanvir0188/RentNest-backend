@@ -1,9 +1,10 @@
 import { Response } from "express";
 
 type TMeta = {
-    page: number;
-    limit: number;
-    total: number;
+    totalItem: number;
+    current_page: number;
+    next_page: number | null;
+    page_item: number;
 }
 
 type TResponseData<T> = {

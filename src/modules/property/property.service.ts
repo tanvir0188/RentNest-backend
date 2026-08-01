@@ -64,10 +64,10 @@ const getAllProperties = async (filters: any, options: any) => {
 
     return {
         meta: {
-            page: Number(page),
-            size: Number(size),
-            total,
-            totalPages: Math.ceil(total / Number(size))
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: properties.length
         },
         data: properties
     };
@@ -110,16 +110,35 @@ const getPropertyDetails = async (id: string) => {
 
 };
 
-const getPropertiesForLandlord = async (landLordId: string) => {
+const getPropertiesForLandlord = async (landLordId: string, options: any) => {
+    const { page = 1, size = 10 } = options || {};
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
     const properties = await prisma.property.findMany({
         where: { landLordId },
+        skip,
+        take,
         include: {
             category: true,
             amenities: true,
             reviews: true
         }
     });
-    return properties;
+
+    const total = await prisma.property.count({
+        where: { landLordId }
+    });
+
+    return {
+        meta: {
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: properties.length
+        },
+        data: properties
+    };
 };
 
 

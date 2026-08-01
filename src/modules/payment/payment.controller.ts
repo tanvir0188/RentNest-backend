@@ -38,12 +38,17 @@ const getPaymentById = catchAsync(async (req: Request, res: Response, next: Next
 const getPaymentListByTenant = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
     const role = req.user?.role as string;
-    const result = await paymentService.getPaymentListDB(userId, role);
+    const options = {
+        page: req.query.page,
+        size: req.query.size,
+    };
+    const result = await paymentService.getPaymentListDB(userId, role, options);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Payments fetched successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     });
 });
 

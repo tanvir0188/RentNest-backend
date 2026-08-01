@@ -20,23 +20,33 @@ const createRentalRequest = catchAsync(async (req: Request, res: Response, next:
 
 const getAllRentalRequestsByTenant = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
-    const result = await rentalRequestService.getAllRentalRequestsFromDBByUserId(userId);
+    const options = {
+        page: req.query.page,
+        size: req.query.size,
+    };
+    const result = await rentalRequestService.getAllRentalRequestsFromDBByUserId(userId, options);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Rental requests fetched successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     });
 });
 
 const getAllRentalRequestsByLandLord = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
-    const result = await rentalRequestService.getRentalRequestsForLandLordDB(userId);
+    const options = {
+        page: req.query.page,
+        size: req.query.size,
+    };
+    const result = await rentalRequestService.getRentalRequestsForLandLordDB(userId, options);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Rental requests fetched successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     });
 });
 
@@ -52,12 +62,17 @@ const getRentalRequestDetail = catchAsync(async (req: Request, res: Response, ne
 });
 
 const getAllRequests = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await rentalRequestService.getAllRentalRequestFromDb();
+    const options = {
+        page: req.query.page,
+        size: req.query.size,
+    };
+    const result = await rentalRequestService.getAllRentalRequestFromDb(options);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Rental requests fetched successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     });
 });
 

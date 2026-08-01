@@ -23,11 +23,7 @@ const getAllProperties = catchAsync(async (req: Request, res: Response, next: Ne
         success: true,
         statusCode: httpStatus.OK,
         message: "Properties fetched successfully",
-        meta: {
-            page: result.meta.page,
-            limit: result.meta.size,
-            total: result.meta.total
-        },
+        meta: result.meta,
         data: result.data
     });
 });
@@ -47,13 +43,18 @@ const getPropertyDetails = catchAsync(async (req: Request, res: Response, next: 
 
 const getPropertiesForLandlord = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const landLordId = req.user?.id;
-    const result = await propertyService.getPropertiesForLandlord(landLordId as string);
+    const options = {
+        page: req.query.page,
+        size: req.query.size,
+    };
+    const result = await propertyService.getPropertiesForLandlord(landLordId as string, options);
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Properties fetched successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     });
 });
 

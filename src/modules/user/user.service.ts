@@ -108,14 +108,21 @@ const updateMyProfileInDB = async (userId: string, payload: UpdateProfilePayload
 
     return updatedUser;
 }
-//all users excluding admin
-const getAllUsersFromDB = async () => {
+const getAllUsersFromDB = async (options: any) => {
+    const { page = 1, size = 10 } = options || {};
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
+    const whereCondition = {
+        NOT: {
+            role: Role.ADMIN
+        }
+    };
+
     const users = await prisma.user.findMany({
-        where: {
-            NOT: {
-                role: Role.ADMIN
-            }
-        },
+        where: whereCondition,
+        skip,
+        take,
         omit: {
             password: true
         },
@@ -124,7 +131,19 @@ const getAllUsersFromDB = async () => {
         }
     });
 
-    return users;
+    const total = await prisma.user.count({
+        where: whereCondition
+    });
+
+    return {
+        meta: {
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: users.length
+        },
+        data: users
+    };
 }
 
 const toggleUserActiveDB = async (userId: string) => {

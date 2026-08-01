@@ -178,9 +178,17 @@ const getPaymentByIdDB = async (id: string, userId: string, role: string) => {
     return payment;
 }
 
-const getPaymentListDB = async (userId: string, role: string) => {
+const getPaymentListDB = async (userId: string, role: string, options: any) => {
+    const { page = 1, size = 10 } = options || {};
+    const skip = (Number(page) - 1) * Number(size);
+    const take = Number(size);
+
+    const whereCondition = role === 'ADMIN' ? {} : { userId: userId };
+
     const payments = await prisma.payment.findMany({
-        where: role === 'ADMIN' ? {} : { userId: userId },
+        where: whereCondition,
+        skip,
+        take,
         include: {
             rentalRequest: {
                 select: {
@@ -203,7 +211,20 @@ const getPaymentListDB = async (userId: string, role: string) => {
             }
         }
     });
-    return payments;
+
+    const total = await prisma.payment.count({
+        where: whereCondition
+    });
+
+    return {
+        meta: {
+            totalItem: total,
+            current_page: Number(page),
+            next_page: skip + take < total ? Number(page) + 1 : null,
+            page_item: payments.length
+        },
+        data: payments
+    };
 }
 
 const changePaymentStatusDB = async (paymentId: string, status: string) => {
