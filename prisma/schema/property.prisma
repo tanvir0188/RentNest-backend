@@ -10,6 +10,8 @@ model Property {
     categoryId String
     category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+    description   String
+
     isAvailable Boolean
 
     createdAt      DateTime        @default(now())
