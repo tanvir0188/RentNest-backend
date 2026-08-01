@@ -4,6 +4,8 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { userService } from "./user.service";
 import { AppError } from "../../errors/AppError";
+import { jwtUtils } from "../../utils/jwt";
+import config from "../../config";
 
 
 
@@ -69,14 +71,15 @@ const registerUser = catchAsync(async (req: Request, res: Response, next: NextFu
 
 const getMyProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    // const {accessToken} = req.cookies;
-    // console.log(req.user, "user request");
+    const {accessToken} = req.cookies;
+    console.log(req.user, "user request");
 
-    // const verifiedToken = jwtUtils.verifyToken(accessToken, config.jwt_access_secret)
+    const verifiedToken = jwtUtils.verifyToken(accessToken, config.jwt_access_secret)
 
-    // if(typeof verifiedToken === "string"){
-    //     throw new Error(verifiedToken);
-    // }
+    if(typeof verifiedToken === "string"){
+        throw new Error(verifiedToken);
+    }
+    console.log(`User id: ${req.user?.id}, Email: ${req.user?.email}, Role: ${req.user?.role}`);
 
     const profile = await userService.getMyProfileFromDB(req.user?.id as string);
 

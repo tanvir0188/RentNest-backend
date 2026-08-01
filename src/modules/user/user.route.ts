@@ -10,16 +10,14 @@ const router = Router();
 
 router.post("/register", validateRegister, userController.registerUser);
 
+// SHARED ROUTES
+router.get("/me", auth(Role.ADMIN, Role.TENANT, Role.LANDLORD), userController.getMyProfile);
+router.put("/profile", auth(Role.ADMIN, Role.TENANT, Role.LANDLORD), userController.updateMyProfile);
+
 // ADMIN ROUTES
 
 router.get("/", auth(Role.ADMIN), userController.getAllUsers);
 router.get("/:id", auth(Role.ADMIN), userController.getUserDetails);
 router.put("/admin/users/:id/toggle-status", auth(Role.ADMIN), userController.toggleUserStatus);
-
-
-// SHARED ROUTES
-
-router.get("/me", auth(Role.ADMIN, Role.TENANT, Role.LANDLORD), userController.getMyProfile);
-router.put("/profile", auth(Role.ADMIN, Role.TENANT, Role.LANDLORD), userController.updateMyProfile);
 
 export const userRoutes = router;

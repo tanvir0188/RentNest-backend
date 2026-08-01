@@ -4,6 +4,7 @@ import { prisma } from "../../lib/prisma";
 import { RegisterUserPayload, UpdateProfilePayload } from "./user.interface";
 import { ActiveStatus, Role } from "../../../generated/prisma/enums";
 import { AppError } from "../../errors/AppError";
+import httpStatus from "http-status";
 import { get } from "node:http";
 
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
@@ -66,7 +67,7 @@ const emailExistInDB = async (email: string, excludeUserId?: string) => {
     return false;
 }
 const getMyProfileFromDB = async (userId: string) => {
-    const user = await prisma.user.findUniqueOrThrow({
+    const user = await prisma.user.findUnique({
         where: { id: userId },
         omit: {
             password: true
@@ -147,7 +148,7 @@ const toggleUserActiveDB = async (userId: string) => {
 }
 
 const getUserDetailsDB = async (userId: string) => {
-    const user = await prisma.user.findUniqueOrThrow({
+    const user = await prisma.user.findUnique({
         where: { id: userId },
         omit: {
             password: true
@@ -156,6 +157,10 @@ const getUserDetailsDB = async (userId: string) => {
             profile: true
         }
     });
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
 
     return user;
 }
