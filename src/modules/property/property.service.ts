@@ -243,9 +243,10 @@ const updateCategory = async (id: string, payload: CategoryPayload) => {
     return result;
 };
 
-const getAllCategories = async () => {
-    const result = await prisma.category.findMany();
-    return result;
+const getFilters = async () => {
+    const categories = await prisma.category.findMany();
+    const amenities = await prisma.amenity.findMany();
+    return { categories, amenities };
 };
 
 const createAmenity = async (payload: { title: string }) => {
@@ -262,10 +263,6 @@ const createAmenity = async (payload: { title: string }) => {
     return result;
 };
 
-const getAllAmenities = async () => {
-    const result = await prisma.amenity.findMany();
-    return result;
-};
 
 const updateAmenity = async (id: string, payload: { title: string }) => {
     const amenity = await prisma.amenity.findUnique({ where: { id } });
@@ -312,9 +309,8 @@ export const propertyService = {
     createCategory,
     deleteCategory,
     updateCategory,
-    getAllCategories,
+    getFilters,
     createAmenity,
-    getAllAmenities,
     updateAmenity,
     deleteAmenity
 };

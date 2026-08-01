@@ -10,8 +10,7 @@ const router = express.Router();
 
 router.get("/properties", propertyController.getAllProperties);
 router.get("/properties/:id", propertyController.getPropertyDetails);
-router.get("/categories", propertyController.getAllCategories);
-router.get("/amenities", propertyController.getAllAmenities);
+router.get("/filters", propertyController.getFilters);
 
 
 // LANDLORD ROUTES

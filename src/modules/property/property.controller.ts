@@ -107,13 +107,13 @@ const createCategory = catchAsync(async (req: Request, res: Response, next: Next
     });
 });
 
-const getAllCategories = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await propertyService.getAllCategories();
+const getFilters = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await propertyService.getFilters();
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "Categories fetched successfully",
+        message: "Filters fetched successfully",
         data: result
     });
 });
@@ -153,16 +153,6 @@ const createAmenity = catchAsync(async (req: Request, res: Response, next: NextF
     });
 });
 
-const getAllAmenities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await propertyService.getAllAmenities();
-
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "Amenities fetched successfully",
-        data: result
-    });
-});
 
 const updateAmenity = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params as { id: string };
@@ -198,9 +188,8 @@ export const propertyController = {
     createCategory,
     deleteCategory,
     updateCategory,
-    getAllCategories,
+    getFilters,
     createAmenity,
-    getAllAmenities,
     updateAmenity,
     deleteAmenity
 };
