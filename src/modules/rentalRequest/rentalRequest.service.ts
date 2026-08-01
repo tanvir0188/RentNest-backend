@@ -215,7 +215,7 @@ const acceptOrRejectRentalRequestDB = async (requestId: string, userId: string, 
     }
     // Check if the request is already accepted or rejected(applies to landlord only)
     
-    if (rentalRequest.status !== RequestStatus.PENDING) {
+    if (role !== Role.ADMIN && rentalRequest.status !== RequestStatus.PENDING) {
         throw new AppError(httpStatus.BAD_REQUEST, `Rental request is already ${rentalRequest.status.toLowerCase()}`);
     }
 
