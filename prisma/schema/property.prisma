@@ -1,6 +1,7 @@
 model Property {
     id         String @id @default(uuid())
     title      String
+    image      String?
     price      Float
     type       String
     location   String

@@ -1,6 +1,7 @@
 export interface CreatePropertyPayload {
     price: number;
     title: string;
+    image?: string;
     type: string;
     location: string;
     landLordId: string;
@@ -13,6 +14,7 @@ export interface CreatePropertyPayload {
 export interface UpdatePropertyPayload {
     price?: number;
     title?: string;
+    image?: string;
     type?: string;
     location?: string;
     categoryId?: string;

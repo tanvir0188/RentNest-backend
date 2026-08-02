@@ -3,13 +3,25 @@ import httpStatus from "http-status";
 import { AppError } from "../../errors/AppError";
 
 export const validateCreateProperty = (req: Request, res: Response, next: NextFunction) => {
-    const { title, price, type, location, categoryId, description } = req.body;
+    const { title, price, image, type, location, categoryId, description } = req.body;
     if (!title) return next(new AppError(httpStatus.BAD_REQUEST, "Valid title is required"));
     if (price === undefined) return next(new AppError(httpStatus.BAD_REQUEST, "Valid price is required"));
     if (!type) return next(new AppError(httpStatus.BAD_REQUEST, "Valid type is required"));
     if (!location) return next(new AppError(httpStatus.BAD_REQUEST, "Valid location is required"));
     if (!categoryId) return next(new AppError(httpStatus.BAD_REQUEST, "Valid categoryId is required"));
     if (!description) return next(new AppError(httpStatus.BAD_REQUEST, "Valid description is required"));
+    //image is optional, so no need to validate if it's a valid url or not.
+    if (image) {
+        if (typeof image !== "string") {
+            return next(new AppError(httpStatus.BAD_REQUEST, "Image must be a valid URL"));
+        }
+
+        try {
+            new URL(image);
+        } catch {
+            return next(new AppError(httpStatus.BAD_REQUEST, "Image must be a valid URL"));
+        }
+    }
     next();
 };
 
