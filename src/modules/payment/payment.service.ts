@@ -72,8 +72,8 @@ const createCheckoutSessionStripe = async (userId: string, rentalRequestId: stri
             },
         ],
         mode: 'payment',
-        success_url: `https://novel-fresh-spaniel.ngrok-free.app/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `https://novel-fresh-spaniel.ngrok-free.app/payment/cancel`,
+        success_url: `https://rent-nest-frontend-one.vercel.app/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `https://rent-nest-frontend-one.vercel.app/payment/cancel`,
         metadata: {
             userId,
             rentalRequestId,
