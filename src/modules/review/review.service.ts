@@ -43,8 +43,8 @@ const createReviewDB = async (userId: string, role: string, data: IReviewCreateP
     if (!rentalRequest.payment || rentalRequest.payment.status !== PaymentStatus.SUCCESS) {
         throw new AppError(httpStatus.BAD_REQUEST, "You can only review properties for which the rental request payment has been completed");
     }
-    if (rentalRequest.status !== RequestStatus.COMPLETED) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You can only review properties for which the rental request is completed");
+    if (rentalRequest.status !== RequestStatus.ACTIVE) {
+        throw new AppError(httpStatus.BAD_REQUEST, "You can only review properties for which the rental request is active");
     }
 
     const existingReview = await prisma.review.findUnique({
@@ -63,6 +63,13 @@ const createReviewDB = async (userId: string, role: string, data: IReviewCreateP
             rentalRequestId,
             propertyId: rentalRequest.propertyId
         }
+    });
+    //if review successfully created, update the rental request status to COMPLETED
+    await prisma.rentalRequest.update({
+        where: { id: rentalRequestId },
+        data: {
+            status: RequestStatus.COMPLETED,
+        },
     });
 
     return review;
