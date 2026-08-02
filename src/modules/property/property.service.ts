@@ -10,14 +10,42 @@ const getAllProperties = async (filters: any, options: any) => {
     const skip = (Number(page) - 1) * Number(size);
     const take = Number(size);
 
-    const { location, price, type } = filters;
+    const { location, price, type, title, categoryId, amenity } = filters;
 
     const andConditions: Prisma.PropertyWhereInput[] = [];
 
     if (location) {
         andConditions.push({
             location: {
-                contains: location
+                contains: location,
+                mode: "insensitive"
+            }
+        });
+    }
+
+    if (title) {
+        andConditions.push({
+            title: {
+                contains: title,
+                mode: "insensitive"
+            }
+        });
+    }
+
+    if (categoryId) {
+        andConditions.push({
+            categoryId: {
+                equals: categoryId
+            }
+        });
+    }
+
+    if (amenity) {
+        andConditions.push({
+            amenities: {
+                some: {
+                    id: amenity
+                }
             }
         });
     }
@@ -25,7 +53,8 @@ const getAllProperties = async (filters: any, options: any) => {
     if (type) {
         andConditions.push({
             type: {
-                equals: type
+                contains: type,
+                mode: "insensitive"
             }
         });
     }

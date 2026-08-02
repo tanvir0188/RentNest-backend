@@ -9,7 +9,9 @@ const getAllProperties = catchAsync(async (req: Request, res: Response, next: Ne
         location: req.query.location,
         price: req.query.price,
         type: req.query.type,
-        amenity: req.query.amenity
+        amenity: req.query.amenity,
+        title: req.query.title,
+        categoryId: req.query.categoryId
     };
 
     const options = {
