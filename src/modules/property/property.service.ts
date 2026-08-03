@@ -294,7 +294,21 @@ const updateCategory = async (id: string, payload: CategoryPayload) => {
 const getFilters = async () => {
     const categories = await prisma.category.findMany();
     const amenities = await prisma.amenity.findMany();
-    return { categories, amenities };
+    const priceAggregation = await prisma.property.aggregate({
+        _max: {
+            price: true,
+        },
+        _min: {
+            price: true,
+        }
+    });
+
+    return { 
+        categories, 
+        amenities,
+        HighestPropertyPrice: priceAggregation._max.price || 0,
+        LowestPropertyPrice: priceAggregation._min.price || 0
+    };
 };
 
 const createAmenity = async (payload: { title: string }) => {
