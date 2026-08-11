@@ -168,7 +168,8 @@ const googleLogin = async (profile: any) => {
 
     return {
         accessToken,
-        refreshToken
+        refreshToken,
+        role: user.role
     };
 }
 
