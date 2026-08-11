@@ -4,23 +4,23 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { authService } from "./auth.service";
 
-const loginUser = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
+const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
 
-    const {accessToken, refreshToken} = await authService.loginUser(payload);
+    const { accessToken, refreshToken } = await authService.loginUser(payload);
 
     res.cookie("accessToken", accessToken, {
-        httpOnly : true,
-        secure : false,
-        sameSite : "none",
-        maxAge : 1000 * 60 * 60 * 24 // 24 hour or 1 day
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 // 24 hour or 1 day
     })
 
     res.cookie("refreshToken", refreshToken, {
-        httpOnly : true,
-        secure : false,
-        sameSite : "none",
-        maxAge : 1000 * 60 * 60 * 24 * 7 // 7 day
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 day
     })
 
     sendResponse(res, {
@@ -31,10 +31,10 @@ const loginUser = catchAsync(async (req : Request, res : Response, next : NextFu
     });
 });
 
-const refreshToken = catchAsync(async (req : Request, res : Response, next: NextFunction) => {
+const refreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
 
-    const {accessToken} = await authService.refreshToken(refreshToken);
+    const { accessToken } = await authService.refreshToken(refreshToken);
 
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -44,35 +44,36 @@ const refreshToken = catchAsync(async (req : Request, res : Response, next: Next
     })
 
     sendResponse(res, {
-        success : true,
-        statusCode : httpStatus.OK,
-        message : "Token Refreshed Successfully",
-        data : {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Token Refreshed Successfully",
+        data: {
             accessToken
         }
     })
 })
 
-const googleAuthCallback = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
+const googleAuthCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // req.user contains the Google profile passed from passport config
-    const {accessToken, refreshToken} = await authService.googleLogin(req.user);
+    const { accessToken, refreshToken, role } = await authService.googleLogin(req.user);
 
     res.cookie("accessToken", accessToken, {
-        httpOnly : true,
-        secure : false,
-        sameSite : "none",
-        maxAge : 1000 * 60 * 60 * 24 // 24 hour or 1 day
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 // 24 hour or 1 day
     })
 
     res.cookie("refreshToken", refreshToken, {
-        httpOnly : true,
-        secure : false,
-        sameSite : "none",
-        maxAge : 1000 * 60 * 60 * 24 * 7 // 7 day
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 day
     })
 
     // Redirect to frontend application
-    res.redirect(`${process.env.APP_URL}/dashboard`);
+    const redirectPath = role === "LANDLORD" ? "dashboard/landlord" : "dashboard/tenant";
+    res.redirect(`${process.env.APP_URL}/${redirectPath}`);
 });
 
 export const authController = {
