@@ -13,7 +13,7 @@ passport.use(
       try {
         // We will handle user creation in the service layer when the callback hits.
         // For now, just pass the profile through.
-        return done(null, profile);
+        return done(null, profile as any);
       } catch (error) {
         return done(error as Error, undefined);
       }
