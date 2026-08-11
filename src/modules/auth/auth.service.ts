@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import httpStatus from "http-status";
 import { JwtPayload, SignOptions } from "jsonwebtoken";
 import config from "../../config";
@@ -115,9 +116,65 @@ const refreshToken = async (refreshToken: string) => {
 
     return { accessToken }
 }
+const googleLogin = async (profile: any) => {
+    const email = profile.emails?.[0].value;
+    const name = profile.displayName;
+
+    if (!email) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Email is required from Google profile");
+    }
+
+    let user = await prisma.user.findUnique({
+        where: { email }
+    });
+
+    if (!user) {
+        // Generate a dummy password for social login users
+        const dummyPassword = await bcrypt.hash(crypto.randomUUID(), Number(config.bcrypt_salt_rounds) || 12);
+        
+        user = await prisma.user.create({
+            data: {
+                email,
+                name,
+                password: dummyPassword,
+                role: "TENANT",
+                activeStatus: "ACTIVE"
+            }
+        });
+    }
+
+    if (user.activeStatus === "BLOCKED") {
+        throw new AppError(httpStatus.FORBIDDEN, "Your account has been blocked. Please contact support.");
+    }
+
+    const jwtPayload = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+    }
+
+    const accessToken = jwtUtils.createToken(
+        jwtPayload,
+        config.jwt_access_secret,
+        config.jwt_access_expires_in as SignOptions
+    );
+
+    const refreshToken = jwtUtils.createToken(
+        jwtPayload,
+        config.jwt_refresh_secret,
+        config.jwt_refresh_expires_in as SignOptions
+    );
+
+    return {
+        accessToken,
+        refreshToken
+    };
+}
 
 
 export const authService = {
     loginUser,
-    refreshToken
+    refreshToken,
+    googleLogin
 }

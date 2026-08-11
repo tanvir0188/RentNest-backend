@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import { propertyController } from "./property.controller";
 import { auth } from "../../middlewares/auth";
 import { Role } from "../../../generated/prisma/enums";
@@ -29,4 +29,4 @@ router.post("/admin/amenity", auth(Role.ADMIN), validateCreateAmenity, propertyC
 router.put("/admin/amenity/:id", auth(Role.ADMIN), propertyController.updateAmenity);
 router.delete("/admin/amenity/:id", auth(Role.ADMIN), propertyController.deleteAmenity);
 
-export const propertyRoutes = router;
+export const propertyRoutes: Router = router;

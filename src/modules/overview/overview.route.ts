@@ -14,4 +14,4 @@ router.get("/landlord/overview", auth(Role.LANDLORD), overviewController.getLand
 // TENANT ROUTES
 router.get("/tenant/overview", auth(Role.TENANT), overviewController.getTenantOverview);
 
-export const overviewRoutes = router;
+export const overviewRoutes: Router = router;

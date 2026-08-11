@@ -53,7 +53,30 @@ const refreshToken = catchAsync(async (req : Request, res : Response, next: Next
     })
 })
 
+const googleAuthCallback = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
+    // req.user contains the Google profile passed from passport config
+    const {accessToken, refreshToken} = await authService.googleLogin(req.user);
+
+    res.cookie("accessToken", accessToken, {
+        httpOnly : true,
+        secure : false,
+        sameSite : "none",
+        maxAge : 1000 * 60 * 60 * 24 // 24 hour or 1 day
+    })
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly : true,
+        secure : false,
+        sameSite : "none",
+        maxAge : 1000 * 60 * 60 * 24 * 7 // 7 day
+    })
+
+    // Redirect to frontend application
+    res.redirect(`${process.env.APP_URL}/dashboard`);
+});
+
 export const authController = {
     loginUser,
-    refreshToken
+    refreshToken,
+    googleAuthCallback
 }

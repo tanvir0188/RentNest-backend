@@ -15,5 +15,9 @@ export default {
     jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN!,
     jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN!,
     stripe_secret_key: process.env.STRIPE_SECRET_KEY!,
-    stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET!
+    stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET!,
+    google_client_id: process.env.GOOGLE_CLIENT_ID!,
+    google_client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+    google_callback_url: process.env.GOOGLE_CALLBACK_URL!,
+    session_secret: process.env.SESSION_SECRET!
 }

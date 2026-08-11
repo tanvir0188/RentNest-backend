@@ -1,7 +1,10 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
+import session from "express-session";
+import passport from "passport";
 import config from "./config";
+import "./config/passport";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import { notFound } from "./middlewares/notFound";
 import { authRoutes } from "./modules/auth/auth.routes";
@@ -74,6 +77,20 @@ app.use("/api/webhook", express.raw({ type: 'application/json' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use(
+    session({
+        secret: config.session_secret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+        },
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.use((req: Request, res: Response, next) => {

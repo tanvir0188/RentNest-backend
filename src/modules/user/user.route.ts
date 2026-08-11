@@ -20,4 +20,4 @@ router.get("/", auth(Role.ADMIN), userController.getAllUsers);
 router.get("/:id", auth(Role.ADMIN), userController.getUserDetails);
 router.put("/admin/users/:id/toggle-status", auth(Role.ADMIN), userController.toggleUserStatus);
 
-export const userRoutes = router;
+export const userRoutes: Router = router;

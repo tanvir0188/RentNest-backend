@@ -22,4 +22,4 @@ router.patch("/admin/payments/status/:id", auth(Role.ADMIN), paymentController.c
 // ==============================
 router.post("/webhook", paymentController.handleWebhook);
 
-export const paymentRoutes = router;
+export const paymentRoutes: Router = router;

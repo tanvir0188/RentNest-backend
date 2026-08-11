@@ -23,4 +23,4 @@ router.patch("/admin/rentals/:id", auth(Role.ADMIN), validateAcceptRejectRequest
 // SHARED ROUTES
 router.get("/rentals/:id", auth(Role.LANDLORD, Role.TENANT, Role.ADMIN), rentalRequestController.getRentalRequestDetail);
 
-export const rentalRequestRoutes = router;
+export const rentalRequestRoutes: Router = router;

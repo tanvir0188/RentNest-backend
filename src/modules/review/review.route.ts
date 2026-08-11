@@ -15,4 +15,4 @@ router.post("/admin", auth(Role.ADMIN), validateCreateReview, reviewController.c
 router.patch("/admin/:id", auth(Role.ADMIN), reviewController.updateReview);
 router.delete("/admin/:id", auth(Role.ADMIN), reviewController.deleteReview);
 
-export const reviewRoutes = router;
+export const reviewRoutes: Router = router;
