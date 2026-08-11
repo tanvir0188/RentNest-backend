@@ -69,8 +69,9 @@ const googleAuthCallback = catchAsync(async (req: Request, res: Response, next: 
     };
     const redirectPath = redirectMap[role] || "dashboard/tenant";
     const finalRedirectUrl = `${process.env.APP_URL}/${redirectPath}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
-    
+
     console.log(`[AuthController] Redirecting user to: ${process.env.APP_URL}/${redirectPath}`);
+    console.log(`[AuthController] final redirect url: ${finalRedirectUrl}`)
     res.redirect(finalRedirectUrl);
 });
 
