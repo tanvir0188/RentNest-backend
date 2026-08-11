@@ -13,6 +13,7 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
         httpOnly: true,
         secure: true,
         sameSite: "none",
+        domain: ".devtanvir.work",
         maxAge: 1000 * 60 * 60 * 24 // 24 hour or 1 day
     })
 
@@ -20,6 +21,7 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
         httpOnly: true,
         secure: true,
         sameSite: "none",
+        domain: ".devtanvir.work",
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 day
     })
 
@@ -40,6 +42,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response, next: NextFu
         httpOnly: true,
         secure: true,
         sameSite: "none",
+        domain: ".devtanvir.work",
         maxAge: 1000 * 60 * 60 * 24 // 24 hour or 1 day
     })
 
@@ -59,19 +62,32 @@ const googleAuthCallback = catchAsync(async (req: Request, res: Response, next: 
     const { accessToken, refreshToken, role } = await authService.googleLogin(req.user);
     console.log(`[AuthController] Tokens generated successfully for role: ${role}`);
 
-    // Redirect to frontend application with tokens as query params
-    // Cross-domain cookies are blocked by modern browsers, so we pass tokens in the URL
-    // The frontend should extract these and store them appropriately
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        domain: ".devtanvir.work",
+        maxAge: 1000 * 60 * 60 * 24 // 24 hour or 1 day
+    })
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        domain: ".devtanvir.work",
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 day
+    })
+
+    // Redirect to frontend application
     const redirectMap: Record<string, string> = {
         ADMIN: "dashboard/admin",
         LANDLORD: "dashboard/landlord",
         TENANT: "dashboard/tenant"
     };
     const redirectPath = redirectMap[role] || "dashboard/tenant";
-    const finalRedirectUrl = `${process.env.APP_URL}/${redirectPath}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+    const finalRedirectUrl = `${process.env.APP_URL}/${redirectPath}`;
 
-    console.log(`[AuthController] Redirecting user to: ${process.env.APP_URL}/${redirectPath}`);
-    console.log(`[AuthController] final redirect url: ${finalRedirectUrl}`)
+    console.log(`[AuthController] Redirecting user to: ${finalRedirectUrl}`);
     res.redirect(finalRedirectUrl);
 });
 
