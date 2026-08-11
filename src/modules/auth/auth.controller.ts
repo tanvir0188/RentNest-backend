@@ -59,30 +59,18 @@ const googleAuthCallback = catchAsync(async (req: Request, res: Response, next: 
     const { accessToken, refreshToken, role } = await authService.googleLogin(req.user);
     console.log(`[AuthController] Tokens generated successfully for role: ${role}`);
 
-    res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: 1000 * 60 * 60 * 24 // 24 hour or 1 day
-    })
-
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 day
-    })
-
-    // Redirect to frontend application
+    // Redirect to frontend application with tokens as query params
+    // Cross-domain cookies are blocked by modern browsers, so we pass tokens in the URL
+    // The frontend should extract these and store them appropriately
     const redirectMap: Record<string, string> = {
         ADMIN: "dashboard/admin",
         LANDLORD: "dashboard/landlord",
         TENANT: "dashboard/tenant"
     };
     const redirectPath = redirectMap[role] || "dashboard/tenant";
-    const finalRedirectUrl = `${process.env.APP_URL}/${redirectPath}`;
+    const finalRedirectUrl = `${process.env.APP_URL}/${redirectPath}?accessToken=${accessToken}&refreshToken=${refreshToken}`;
     
-    console.log(`[AuthController] Redirecting user to: ${finalRedirectUrl}`);
+    console.log(`[AuthController] Redirecting user to: ${process.env.APP_URL}/${redirectPath}`);
     res.redirect(finalRedirectUrl);
 });
 
