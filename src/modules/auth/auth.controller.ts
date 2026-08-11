@@ -54,8 +54,10 @@ const refreshToken = catchAsync(async (req: Request, res: Response, next: NextFu
 })
 
 const googleAuthCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    console.log(`[AuthController] googleAuthCallback started for user:`, req.user?.email);
     // req.user contains the Google profile passed from passport config
     const { accessToken, refreshToken, role } = await authService.googleLogin(req.user);
+    console.log(`[AuthController] Tokens generated successfully for role: ${role}`);
 
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -78,7 +80,10 @@ const googleAuthCallback = catchAsync(async (req: Request, res: Response, next: 
         TENANT: "dashboard/tenant"
     };
     const redirectPath = redirectMap[role] || "dashboard/tenant";
-    res.redirect(`${process.env.APP_URL}/${redirectPath}`);
+    const finalRedirectUrl = `${process.env.APP_URL}/${redirectPath}`;
+    
+    console.log(`[AuthController] Redirecting user to: ${finalRedirectUrl}`);
+    res.redirect(finalRedirectUrl);
 });
 
 export const authController = {
