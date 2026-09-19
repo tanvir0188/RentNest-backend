@@ -119,13 +119,17 @@ const refreshToken = async (refreshToken: string) => {
 const googleLogin = async (profile: any) => {
     const email = profile.emails?.[0].value;
     const name = profile.displayName;
+    const profilePhoto = profile.photos?.[0]?.value || profile._json?.picture;
 
     if (!email) {
         throw new AppError(httpStatus.BAD_REQUEST, "Email is required from Google profile");
     }
 
     let user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
+        include: {
+            profile: true
+        }
     });
 
     if (!user) {
@@ -138,7 +142,22 @@ const googleLogin = async (profile: any) => {
                 name,
                 password: dummyPassword,
                 role: "TENANT",
-                activeStatus: "ACTIVE"
+                activeStatus: "ACTIVE",
+                profile: {
+                    create: {
+                        profilePhoto
+                    }
+                }
+            },
+            include: {
+                profile: true
+            }
+        });
+    } else if (!user.profile) {
+        await prisma.profile.create({
+            data: {
+                userId: user.id,
+                profilePhoto
             }
         });
     }

@@ -90,9 +90,15 @@ const updateMyProfileInDB = async (userId: string, payload: UpdateProfilePayload
             name,
             email,
             profile: {
-                update: {
-                    profilePhoto,
-                    bio
+                upsert: {
+                    create: {
+                        profilePhoto,
+                        bio
+                    },
+                    update: {
+                        profilePhoto,
+                        bio
+                    }
                 }
             }
         },

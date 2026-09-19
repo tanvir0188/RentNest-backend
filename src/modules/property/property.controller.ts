@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { propertyService } from "./property.service";
+import { uploadToCloudinary } from "../../lib/cloudinary";
 
 const getAllProperties = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const filters = {
@@ -61,13 +62,44 @@ const getPropertiesForLandlord = catchAsync(async (req: Request, res: Response, 
 });
 
 const createProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const landLordId = req.user?.id; 
-    console.log("Landlord ID:", landLordId); 
-    const result = await propertyService.createProperty({ ...req.body, landLordId }, landLordId as string);
+    const landLordId = req.user?.id;
+
+    let payload = req.body || {};
+    if (typeof payload.data === "string") {
+        try {
+            const parsed = JSON.parse(payload.data);
+            payload = { ...parsed, ...payload };
+            delete payload.data;
+        } catch {
+            // keep payload as is
+        }
+    }
+
+    if (payload.price !== undefined && payload.price !== "") {
+        payload.price = Number(payload.price);
+    }
+    if (typeof payload.isAvailable === "string") {
+        payload.isAvailable = payload.isAvailable === "true";
+    }
+    if (typeof payload.amenities === "string") {
+        try {
+            payload.amenities = JSON.parse(payload.amenities);
+        } catch {
+            payload.amenities = [payload.amenities];
+        }
+    }
+
+    if (req.file) {
+        payload.image = await uploadToCloudinary(req.file, "rentnest/properties");
+    } else if (payload.image && (payload.image.startsWith("data:image/") || payload.image.startsWith("data:application/"))) {
+        payload.image = await uploadToCloudinary(payload.image, "rentnest/properties");
+    }
+
+    const result = await propertyService.createProperty({ ...payload, landLordId }, landLordId as string);
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED, 
+        statusCode: httpStatus.CREATED,
         message: "Property created successfully",
         data: result
     });
@@ -76,7 +108,39 @@ const createProperty = catchAsync(async (req: Request, res: Response, next: Next
 const updateProperty = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params as { id: string };
     const user = req.user as any;
-    const result = await propertyService.updateProperty(id, req.body, user.id, user.role);
+
+    let payload = req.body || {};
+    if (typeof payload.data === "string") {
+        try {
+            const parsed = JSON.parse(payload.data);
+            payload = { ...parsed, ...payload };
+            delete payload.data;
+        } catch {
+            // keep payload as is
+        }
+    }
+
+    if (payload.price !== undefined && payload.price !== "") {
+        payload.price = Number(payload.price);
+    }
+    if (typeof payload.isAvailable === "string") {
+        payload.isAvailable = payload.isAvailable === "true";
+    }
+    if (typeof payload.amenities === "string") {
+        try {
+            payload.amenities = JSON.parse(payload.amenities);
+        } catch {
+            payload.amenities = [payload.amenities];
+        }
+    }
+
+    if (req.file) {
+        payload.image = await uploadToCloudinary(req.file, "rentnest/properties");
+    } else if (payload.image && (payload.image.startsWith("data:image/") || payload.image.startsWith("data:application/"))) {
+        payload.image = await uploadToCloudinary(payload.image, "rentnest/properties");
+    }
+
+    const result = await propertyService.updateProperty(id, payload, user.id, user.role);
 
     sendResponse(res, {
         success: true,

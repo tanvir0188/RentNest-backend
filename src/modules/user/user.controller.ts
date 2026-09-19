@@ -6,6 +6,7 @@ import { userService } from "./user.service";
 import { AppError } from "../../errors/AppError";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../config";
+import { uploadToCloudinary } from "../../lib/cloudinary";
 
 
 
@@ -95,7 +96,30 @@ const getMyProfile = catchAsync(async (req: Request, res: Response, next: NextFu
 const updateMyProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
 
-    const payload = req.body;
+    let payload = req.body || {};
+    if (typeof payload.data === "string") {
+        try {
+            const parsed = JSON.parse(payload.data);
+            payload = { ...parsed, ...payload };
+            delete payload.data;
+        } catch {
+            // keep payload as is
+        }
+    }
+
+    if (req.file) {
+        payload.profilePhoto = await uploadToCloudinary(req.file, "rentnest/profiles");
+    } else if (payload.profilePhoto && (payload.profilePhoto.startsWith("data:image/") || payload.profilePhoto.startsWith("data:application/"))) {
+        payload.profilePhoto = await uploadToCloudinary(payload.profilePhoto, "rentnest/profiles");
+    } else if (payload.image) {
+        if (payload.image.startsWith("data:image/") || payload.image.startsWith("data:application/")) {
+            payload.profilePhoto = await uploadToCloudinary(payload.image, "rentnest/profiles");
+        } else {
+            payload.profilePhoto = payload.image;
+        }
+        delete payload.image;
+    }
+
     if (payload.email) {
         const emailExists = await userService.emailExistInDB(payload.email, userId);
         if (emailExists) {
@@ -104,7 +128,7 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response, next: Nex
                 statusCode: httpStatus.BAD_REQUEST,
                 message: "Email already exists",
                 data: null
-            })
+            });
             return;
         }
     }
@@ -116,8 +140,8 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response, next: Nex
         statusCode: httpStatus.OK,
         message: "User profile updated successfully",
         data: { updatedProfile }
-    })
-})
+    });
+});
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const options = {

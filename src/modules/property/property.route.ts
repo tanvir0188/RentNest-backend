@@ -3,6 +3,7 @@ import { propertyController } from "./property.controller";
 import { auth } from "../../middlewares/auth";
 import { Role } from "../../../generated/prisma/enums";
 import { validateCreateProperty, validateCreateCategory, validateCreateAmenity } from "./property.validation";
+import { fileUploadMiddleware } from "../../lib/cloudinary";
 
 const router = express.Router();
 
@@ -16,8 +17,19 @@ router.get("/filters", propertyController.getFilters);
 // LANDLORD ROUTES
 
 router.get("/landlord/properties", auth(Role.LANDLORD), propertyController.getPropertiesForLandlord);
-router.post("/landlord/properties", auth(Role.LANDLORD), validateCreateProperty, propertyController.createProperty);
-router.put("/landlord/properties/:id", auth(Role.LANDLORD, Role.ADMIN), propertyController.updateProperty);
+router.post(
+    "/landlord/properties",
+    auth(Role.LANDLORD),
+    fileUploadMiddleware(["image", "file"]),
+    validateCreateProperty,
+    propertyController.createProperty
+);
+router.put(
+    "/landlord/properties/:id",
+    auth(Role.LANDLORD, Role.ADMIN),
+    fileUploadMiddleware(["image", "file"]),
+    propertyController.updateProperty
+);
 router.delete("/landlord/properties/:id", auth(Role.LANDLORD, Role.ADMIN), propertyController.deleteProperty);
 
 // ADMIN ROUTES
