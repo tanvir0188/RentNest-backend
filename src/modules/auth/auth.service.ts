@@ -133,6 +133,7 @@ const googleLogin = async (profile: any) => {
     });
 
     if (!user) {
+        console.log(`[AuthService] New Google user detected. Creating account for: ${email}`);
         // Generate a dummy password for social login users
         const dummyPassword = await bcrypt.hash(crypto.randomUUID(), Number(config.bcrypt_salt_rounds) || 12);
         
@@ -160,6 +161,9 @@ const googleLogin = async (profile: any) => {
                 profilePhoto
             }
         });
+        console.log(`[AuthService] Account created successfully for: ${email}`);
+    } else {
+        console.log(`[AuthService] Existing user logged in via Google: ${email} (Role: ${user.role})`);
     }
 
     if (user.activeStatus === "BLOCKED") {
@@ -187,7 +191,8 @@ const googleLogin = async (profile: any) => {
 
     return {
         accessToken,
-        refreshToken
+        refreshToken,
+        role: user.role
     };
 }
 

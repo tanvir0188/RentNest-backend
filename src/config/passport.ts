@@ -11,9 +11,10 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log(`[Passport] Google Strategy Callback Hit for: ${profile.displayName} (${profile.emails?.[0]?.value})`);
         // We will handle user creation in the service layer when the callback hits.
         // For now, just pass the profile through.
-        return done(null, profile);
+        return done(null, profile as any);
       } catch (error) {
         return done(error as Error, undefined);
       }
